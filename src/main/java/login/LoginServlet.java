@@ -2,7 +2,6 @@ package login;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +50,7 @@ public class LoginServlet extends HttpServlet {
 			response.sendRedirect("home.jsp");
         } else {
             // Authentication failed
-        	out.println("<font color=red size=14 face=verdana>Sorry! username or password incorrect ... Try again!");
+        	out.println("Sorry! username or password incorrect ... Try again!");
 			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
 			rd.include(request, response);
         }

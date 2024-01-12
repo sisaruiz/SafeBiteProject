@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,12 +50,12 @@ public class SignupServlet extends HttpServlet {
         Document omonymous = usersCollection.find(new Document("user_name", username)).first();
         if (omonymous != null) {
             //It exists
-        	out.println("<font color=red size=14 face=verdana>Sorry! Username already exists. Please, choose a different one.");
+        	out.println("Sorry! Username already exists. Please, choose a different one.");
 			RequestDispatcher rd = request.getRequestDispatcher("signup.jsp");
 			rd.include(request, response);
         }
         else {
-            //Create document with new user data
+            //Create document with new user data			
             Document newUser = new Document("user_name", username)
             		.append("email", email)
             		.append("password", psw)
@@ -65,8 +66,12 @@ public class SignupServlet extends HttpServlet {
     		//Insert new user into users dataset
             usersCollection.insertOne(newUser);
             
-            //Redirect to success page
-            response.sendRedirect("success.jsp");
+            //Save name to associate subsequent diet setup
+        	HttpSession hs=request.getSession();
+			hs.setAttribute("uname", username);
+            
+            //Redirect to profile setting page
+            response.sendRedirect("profile_setup.jsp");
         }
   
 		myClient.close();

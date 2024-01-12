@@ -29,4 +29,14 @@
     <servlet-name>SignupServlet</servlet-name>
     <url-pattern>/SignupServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DietServlet</display-name>
+    <servlet-name>DietServlet</servlet-name>
+    <servlet-class>signup.DietServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DietServlet</servlet-name>
+    <url-pattern>/DietServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
