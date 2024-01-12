@@ -4,23 +4,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login success</title>
+<title>Registration success</title>
 </head>
 <body>
-<%
-	if(session.getAttribute("uname")==null){
-		response.sendRedirect("login.jsp");
-	}
-%>
-<h1>
-Welcome, <%=session.getAttribute("uname")%>
-<br>
-Login successful...
-</h1>
-<br>
-<form action=logout.jsp>
-<input type=submit value=Logout>
-
-</form>
+<h1>Your registration was successful. Welcome to our community!</h1>
+<h2>Click <a href="login.jsp">here</a> to log in and start enjoying all the features we have for you. Cheers!</h2>
 </body>
 </html>

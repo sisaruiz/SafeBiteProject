@@ -48,14 +48,15 @@ public class LoginServlet extends HttpServlet {
             // Authentication successful
         	HttpSession hs=request.getSession();
 			hs.setAttribute("uname", n);
-			response.sendRedirect("success.jsp");
+			response.sendRedirect("home.jsp");
         } else {
             // Authentication failed
         	out.println("<font color=red size=14 face=verdana>Sorry! username or password incorrect ... Try again!");
 			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
 			rd.include(request, response);
         }
-		
+        
+        myClient.close();
 	}
 
 }

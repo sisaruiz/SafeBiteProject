@@ -15,5 +15,6 @@
 				<input type=submit value=Login>		<input type=reset>
 </pre>
 </form>
+<p>Not registered yet? <a href="signup.jsp">Create</a> an account.</p>
 </body>
 </html>
