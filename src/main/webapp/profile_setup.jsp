@@ -28,7 +28,6 @@
 	<input type="checkbox" id="oats" name="allergens" value="oats" /><label for="oats">Oats</label>	
 	<input type="checkbox" id="spelt" name="allergens" value="spelt" /><label for="spelt">Spelt</label>
 	<input type="checkbox" id="kamut" name="allergens" value="kamut" /><label for="kamut">Kamut</label>
-	<input type="checkbox" id="spelt" name="allergens" value="spelt" /><label for="spelt">Spelt</label>
 	<input type="checkbox" id="cabbage" name="allergens" value="cabbage" /><label for="cabbage">Cabbage</label>
 	<input type="checkbox" id="broccoli" name="allergens" value="broccoli" /><label for="broccoli">Broccoli</label>
 	<input type="checkbox" id="cauliflower" name="allergens" value="cauliflower" /><label for="cauliflower">Cauliflower</label>
