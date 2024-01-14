@@ -67,7 +67,7 @@ public class SignupServlet extends HttpServlet {
             usersCollection.insertOne(newUser);
             
             //Save name to associate subsequent diet setup
-        	HttpSession hs=request.getSession();
+        	HttpSession hs = request.getSession();
 			hs.setAttribute("uname", username);
             
             //Redirect to profile setting page

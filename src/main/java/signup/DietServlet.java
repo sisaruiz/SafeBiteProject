@@ -29,43 +29,44 @@ public class DietServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		//Create connection string
-		ConnectionString uri = new ConnectionString("mongodb://localhost:27017");
-		//Create a mongoDB client
-		MongoClient myClient = MongoClients.create(uri);
+	    
+	    //Create connection string
+	    ConnectionString uri = new ConnectionString("mongodb://localhost:27017");
+	    //Create a mongoDB client
+	    MongoClient myClient = MongoClients.create(uri);
 
-		//Connect to database
-		MongoDatabase database = myClient.getDatabase("SafeBite");
-		//Select the collection test
-		MongoCollection<Document> usersCollection = database.getCollection("Users");
-		
-		//Get parameter values
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-		    // Redirect to login page
-		    response.sendRedirect("login.jsp");
-		}
-		String username = (String) session.getAttribute("uname");
-		String diet = request.getParameter("diet");
-		String[] array = request.getParameterValues("allergens");
-		List<String> allergies = null;
-		if (array != null) {
-		    allergies = Arrays.asList(array);
-		} else {
-		    allergies = new ArrayList<>();
-		}
+	    //Connect to database
+	    MongoDatabase database = myClient.getDatabase("SafeBite");
+	    //Select the collection test
+	    MongoCollection<Document> usersCollection = database.getCollection("Users");
+	    
+	    //Get parameter values
+	    HttpSession session = request.getSession(false);
+	    if (session == null || session.getAttribute("uname") == null) {
+	        // Redirect to login page
+	        response.sendRedirect("login.jsp");
+	        return; // Stop further execution
+	    }
+	    String username = (String) session.getAttribute("uname");
+	    String diet = request.getParameter("diet");
+	    String[] array = request.getParameterValues("allergens");
+	    List<String> allergies = null;
+	    if (array != null) {
+	        allergies = Arrays.asList(array);
+	    } else {
+	        allergies = new ArrayList<>();
+	    }
 
-		//Update related doc
-		usersCollection.updateOne(new Document("user_name", username), new Document("$set",
-		    new Document("diet_type", diet)
-		        .append("allergy", new Document("allergens", allergies))));
+	    //Update related doc
+	    usersCollection.updateOne(new Document("user_name", username), new Document("$set",
+	        new Document("diet_type", diet)
+	            .append("allergy", new Document("allergens", allergies))));
 
-		
-		//Redirect to success page
-		response.sendRedirect("success.jsp");
-		
-		myClient.close();
+	    
+	    //Redirect to success page
+	    response.sendRedirect("success.jsp");
+	    
+	    myClient.close();
 	}
 
 }
