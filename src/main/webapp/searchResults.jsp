@@ -8,8 +8,8 @@
     <style>
         /* Set a fixed width and height for the product images */
         img.product-image {
-            width: 70px; /* Set your preferred width */
-            height: 70px'; /* Set your preferred height */
+            width: 80px; /* Set your preferred width */
+            height: 800px'; /* Set your preferred height */
             object-fit: cover; /* Optional: Maintain aspect ratio and cover entire container */
         }
 

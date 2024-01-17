@@ -12,22 +12,23 @@
 		response.sendRedirect("login.jsp");
 	}
 %>
-<h1>
+<h2>
 Welcome, <%=session.getAttribute("uname")%>
+</h2>
 <br>
-Login successful...
-</h1>
+<p><a href="profile.jsp">Your profile</a></p>
 <br>
-<form action=logout.jsp>
-<input type=submit value=Logout>
+<form action="logout.jsp">
+    <input type="submit" value="Logout">
 </form>
+<br>
+<a href="browseProducts.jsp">Search products</a>
+<a href="browseUsers.jsp">Search users</a>
 <section>
-<form action="SearchServlet" method="POST">
-        <label for="searchTerm">Search Term:</label>
-        <input type="text" id="searchTerm" name="searchTerm" required>
-        <br>
-        <input type="submit" value="Search">
-</form>
+    <h3>Products you may want to try ...</h3>
+</section>
+<section>
+    <h3>Explore potential connections ...</h3>
 </section>
 </body>
 </html>
