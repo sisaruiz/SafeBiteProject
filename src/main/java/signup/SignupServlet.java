@@ -61,7 +61,8 @@ public class SignupServlet extends HttpServlet {
             		.append("password", psw)
             		.append("country", country)
             		.append("date_of_birth", dateOfBirth)
-            		.append("gender", gender);
+            		.append("gender", gender)
+            		.append("admin", false);
 
     		//Insert new user into users dataset
             usersCollection.insertOne(newUser);
