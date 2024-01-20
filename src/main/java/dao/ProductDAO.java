@@ -2,7 +2,9 @@ package dao;
 
 import model.Product;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -82,9 +84,23 @@ public class ProductDAO {
             // Extract fields from the document
             String productName = productDoc.getString("product_name");
             String imageUrl = productDoc.getString("image_url");
-
+            String allergens = productDoc.getString("allergens");
+            String brandOwner = productDoc.getString("brand_owner");
+            String brands = productDoc.getString("brands");
+            String countries = productDoc.getString("countries_en");
+            Date entryTS = productDoc.getDate("created_datetime");
+            String categories = productDoc.getString("food_groups_en");
+            String ingredients = productDoc.getString("ingredients_tags");
+            String labels = productDoc.getString("labels_tags");
+            Date updateTS = productDoc.getDate("last_modified_datetime");
+            String lastUpdator = productDoc.getString("last_modified_by");
+            String quantity = productDoc.getString("quantity");
+            String traces = productDoc.getString("traces_tags");
+            
             // Create and return a Product instance
-            return new Product(productId, productName, imageUrl);
+            return new Product(productId, productName, imageUrl, quantity, categories, ingredients,
+            		allergens, traces, labels, brandOwner, brands, countries, entryTS, lastUpdator,
+            		updateTS);
         } else {
             // Product not found
             System.out.println("Product not found for ID: " + productId);
