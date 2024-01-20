@@ -16,7 +16,7 @@
 Welcome, <%=session.getAttribute("uname")%>
 </h2>
 <br>
-<p><a href="profile.jsp">Your profile</a></p>
+<p><a href="yourProfile.jsp">Your profile</a></p>
 <br>
 <form action="logout.jsp">
     <input type="submit" value="Logout">
