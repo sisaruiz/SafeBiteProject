@@ -2,6 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ page import="model.User" %>
 <%@ page import="model.UserDAO" %>
+<%@ page import="model.Review" %>
+<%@ page import="model.ReviewDAO" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +16,8 @@
         String username = (String) session.getAttribute("uname");
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(username);
+        ReviewDAO reviewDAO = new ReviewDAO();
+        List<Review> userReviews = reviewDAO.getLastThreeReviewsByUsername(username);
     %>
 <h1>Your profile</h1>
 <img class="user-img" src=<%= user.getPic() %>>
@@ -26,6 +31,13 @@
 <p>Allergens:<%= user.getAllergens() %></p>
 <br>
 <p>Your last reviews:</p>
+<%
+    for (Review review : userReviews) {
+%>
+    <p>Review: <%= review.getReviewText() %></p>
+<%
+    }
+%>
 
 <input type="submit" value="Edit Profile">
 
