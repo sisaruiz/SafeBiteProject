@@ -15,7 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReviewDAO {
     private final MongoClient mongoClient;
@@ -27,16 +29,20 @@ public class ReviewDAO {
         this.reviewCollection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
     }
 
-    public List<Review> getLastThreeReviewsByUsername(String username) {
-        List<Review> reviews = new ArrayList<>();
-
-        // Fetch all reviews for the given username
+    public Object getLastThreeReviewsWithDates(String username) {
         List<Document> userReviews = new ArrayList<>();
-        try (MongoCursor<Document> cursor = reviewCollection.find(Filters.eq("User", username))
-                .iterator()) {
+        List<Review> reviews = new ArrayList<>();
+        List<Date> reviewDates = new ArrayList<>();  // List to store review dates
+
+        try (MongoCursor<Document> cursor = reviewCollection.find(Filters.eq("User", username)).iterator()) {
             while (cursor.hasNext()) {
                 userReviews.add(cursor.next());
             }
+        }
+
+        // Check if there are no reviews
+        if (userReviews.isEmpty()) {
+            return "You don't have any reviews yet.";
         }
 
         // Sort the reviews by date in descending order
@@ -51,15 +57,32 @@ public class ReviewDAO {
             }
         }).reversed());
 
-        // Retrieve the last 3 reviews
+        // Retrieve the last 3 reviews and their dates
         for (int i = 0; i < Math.min(userReviews.size(), 3); i++) {
             Document reviewDoc = userReviews.get(i);
             Review review = documentToReview(reviewDoc);
             reviews.add(review);
+
+            // Get and add the date to the list
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+                Date date = dateFormat.parse((String) reviewDoc.get("Review Date"));
+                reviewDates.add(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                // Handle the exception if needed
+            }
         }
 
-        return reviews;
+        // Create a Map to store both reviews and dates
+        Map<String, Object> result = new HashMap<>();
+        result.put("reviews", reviews);
+        result.put("reviewDates", reviewDates);
+
+        return result;
     }
+
+        
 
     private Review documentToReview(Document document) {
         String username = document.getString("User");

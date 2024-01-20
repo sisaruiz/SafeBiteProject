@@ -1,28 +1,32 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="model.User" %>
-<<<<<<< HEAD
 <%@ page import="dao.UserDAO" %>
 <%@ page import="model.Review" %>
 <%@ page import="dao.ReviewDAO" %>
 <%@ page import="java.util.List" %>
-=======
-<%@ page import="dao.UserDAO" %>
->>>>>>> 336248dc4bc49b50b7b3c78122a9343d4a3f215c
+<%@ page import="java.text.SimpleDateFormat" %>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Your Profile</title>
 </head>
 <body>
 <%
-        String username = (String) session.getAttribute("uname");
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.getUserByUsername(username);
-        ReviewDAO reviewDAO = new ReviewDAO();
-        List<Review> userReviews = reviewDAO.getLastThreeReviewsByUsername(username);
-    %>
+    String username = (String) session.getAttribute("uname");
+    UserDAO userDAO = new UserDAO();
+    User user = userDAO.getUserByUsername(username);
+    ReviewDAO reviewDAO = new ReviewDAO();
+    Object reviewsObject = reviewDAO.getLastThreeReviewsWithDates(username);
+    if (reviewsObject instanceof Map) {
+        Map<String, Object> result = (Map<String, Object>) reviewsObject;
+        List<Review> userReviews = (List<Review>) result.get("reviews");
+        List<Date> reviewDates = (List<Date>) result.get("reviewDates");
+%>
 <h1>Your profile</h1>
 <img class="user-img" src=<%= user.getPic() %>>
 <p>Username:<%= user.getName() %></p>
@@ -36,14 +40,20 @@
 <br>
 <p>Your last reviews:</p>
 <%
-    for (Review review : userReviews) {
+    for (int i = 0; i < userReviews.size(); i++) {
+        Review review = userReviews.get(i);
+        Date date = reviewDates.get(i);
 %>
     <p>Review: <%= review.getReviewText() %></p>
+    <p>Date: <%= new SimpleDateFormat("dd MMMM yyyy").format(date) %></p>
 <%
     }
 %>
 
 <input type="submit" value="Edit Profile">
 
+<%
+    }
+%>
 </body>
 </html>
