@@ -5,22 +5,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Product;
+import dao.ProductDAO;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
-import org.bson.Document;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 
 public class SearchServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private final ProductDAO productDAO = new ProductDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -28,52 +20,29 @@ public class SearchServlet extends HttpServlet {
         String searchTerm = request.getParameter("searchTerm");
         System.out.println("Received searchTerm: " + searchTerm);
 
-        // Call a database or other data source to search for matching records
-        List<Product> products = new ArrayList<>();
-        if (searchTerm != null) {
-            products.addAll(getProducts(searchTerm));
-        }
+        // Call the DAO to search for matching records
+        List<Product> allProducts = productDAO.searchProducts(searchTerm);
 
-        // Send the search results back to the JSP page
-        request.setAttribute("products", products);
+        // Set the total number of results in the request
+        request.setAttribute("numberOfResults", allProducts.size());
+
+        // Get the requested page from the parameter, default to 1 if not present
+        int currentPage = (request.getParameter("page") != null) ? Integer.parseInt(request.getParameter("page")) : 1;
+
+        // Calculate the starting and ending indexes for the current page
+        int resultsPerPage = 10; // Adjust this based on your preference
+        int startIndex = (currentPage - 1) * resultsPerPage;
+        int endIndex = Math.min(startIndex + resultsPerPage, allProducts.size());
+
+        // Extract the subset of products for the current page
+        List<Product> productsForPage = allProducts.subList(startIndex, endIndex);
+
+        // Add the list of products for the current page to the request
+        request.setAttribute("products", productsForPage);
+        request.setAttribute("currentPage", currentPage);
+
+        // Forward the request to the JSP page for rendering
+        request.setAttribute("searchTerm", searchTerm); 
         request.getRequestDispatcher("searchResults.jsp").forward(request, response);
-    }
-
-    private List<Product> getProducts(String searchTerm) {
-        // Convert Document objects to Product objects
-        List<Product> products = new ArrayList<>();
-
-        // Establish a connection to the MongoDB database
-        String uri = "mongodb://localhost:27017/SafeBite";
-
-        try (MongoClient client = MongoClients.create(new ConnectionString(uri))) {
-            MongoDatabase database = client.getDatabase("SafeBite");
-            MongoCollection<Document> collection = database.getCollection("Products");
-
-            // Query the 'Products' collection for matching documents
-            Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
-            Document query = new Document("product_name", pattern);
-            System.out.println("Constructed MongoDB Query: " + query.toJson());
-
-            long resultCount = collection.countDocuments(query);
-            System.out.println("Number of matching documents: " + resultCount);
-
-            for (Document productDoc : collection.find(query)) {
-                // Extract fields from the Document
-                String productId = productDoc.getObjectId("_id").toString();
-                String productName = productDoc.getString("product_name");
-                String imageUrl = productDoc.getString("image_url");
-
-                // Create a Product instance
-                Product product = new Product(productId, productName, imageUrl);
-                products.add(product);
-            }
-        } catch (Exception e) {
-            System.out.print("Connection to DB failed");
-            e.printStackTrace();  // You might want to log the exception instead
-            // Handle the exception, e.g., show an error page or log it
-        }
-
-        return products;
     }
 }

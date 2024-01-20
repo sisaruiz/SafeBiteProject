@@ -1,10 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="model.User" %>
-<%@ page import="model.UserDAO" %>
+<<<<<<< HEAD
+<%@ page import="dao.UserDAO" %>
 <%@ page import="model.Review" %>
-<%@ page import="model.ReviewDAO" %>
+<%@ page import="dao.ReviewDAO" %>
 <%@ page import="java.util.List" %>
+=======
+<%@ page import="dao.UserDAO" %>
+>>>>>>> 336248dc4bc49b50b7b3c78122a9343d4a3f215c
 <!DOCTYPE html>
 <html>
 <head>
