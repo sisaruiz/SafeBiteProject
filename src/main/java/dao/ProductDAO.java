@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -56,5 +57,38 @@ public class ProductDAO {
 
         return products;
     }
+    
+    // Add a method to retrieve a product by its ID
+    public Product getProductById(String productId) {
 
+    	// Convert the string representation of ObjectId to ObjectId
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(productId);
+        } catch (IllegalArgumentException e) {
+            // Handle invalid ObjectId format
+            System.out.println("Invalid ObjectId format for product ID: " + productId);
+            return null;
+        }
+
+        // Construct the query to find the product by ObjectId
+        Document query = new Document("_id", objectId);
+
+        // Execute the query and retrieve the product document
+        Document productDoc = productsCollection.find(query).first();
+
+        // Check if the product document is found
+        if (productDoc != null) {
+            // Extract fields from the document
+            String productName = productDoc.getString("product_name");
+            String imageUrl = productDoc.getString("image_url");
+
+            // Create and return a Product instance
+            return new Product(productId, productName, imageUrl);
+        } else {
+            // Product not found
+            System.out.println("Product not found for ID: " + productId);
+            return null;
+        }
+    }
 }

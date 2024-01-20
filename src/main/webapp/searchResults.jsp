@@ -69,11 +69,11 @@
                     Product product = allProducts.get(i);
         %>
             <div class="product-container">
-                <img class="product-image" src="<%= product.getImgURL() %>">
-                <p>
-                    <a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
-                </p>
-            </div>
+    			<img class="product-image" src="<%= product.getImgURL() %>">
+    				<p>
+        			<a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+    				</p>
+			</div>
         <%
                 }
             } else {
