@@ -49,4 +49,14 @@
     <servlet-name>SearchServlet</servlet-name>
     <url-pattern>/SearchServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ReviewServlet</display-name>
+    <servlet-name>ReviewServlet</servlet-name>
+    <servlet-class>review.ReviewServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReviewServlet</servlet-name>
+    <url-pattern>/ReviewServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

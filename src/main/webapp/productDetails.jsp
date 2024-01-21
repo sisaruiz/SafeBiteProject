@@ -38,6 +38,26 @@
 			<!-- Last update -->
 			<p>Last Update By: <%= product.getLastUpdateBy() != null ? product.getLastUpdateBy() : "not available" %></p>
 			<p>Last Update Timestamp: <%= product.getLastUpdateTS() != null ? product.getLastUpdateTS() : "not available" %></p>
+			
+			<section>
+			<h3>Reviews</h3>
+			<!-- Review insertion -->
+			<h4>Insert review:</h4>
+			<form action="ReviewServlet?productId=<%= productId %>&productName=<%= product.getName() %>" method="post">
+<pre>
+			Rating:		<select id="r_score" name="r_score">
+						  <option value="1">1</option>
+						  <option value="2">2</option>
+						  <option value="3">3</option>
+						  <option value="4">4</option>
+						  <option value="5">5</option>
+						</select>
+			Heading:	<input type="text" name="r_heading">
+			Text:		<input type="text" name="r_text">
+				<input type=submit value=Insert>		<input type=reset>
+</pre>
+</form>
+			</section>
 
     <%
         } else {

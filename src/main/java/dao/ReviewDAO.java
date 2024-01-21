@@ -80,9 +80,7 @@ public class ReviewDAO {
         result.put("reviewDates", reviewDates);
 
         return result;
-    }
-
-        
+    }        
 
     private Review documentToReview(Document document) {
         String username = document.getString("User");
