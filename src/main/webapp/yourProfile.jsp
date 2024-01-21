@@ -22,38 +22,50 @@
     User user = userDAO.getUserByUsername(username);
     ReviewDAO reviewDAO = new ReviewDAO();
     Object reviewsObject = reviewDAO.getLastThreeReviewsWithDates(username);
+
+    %>
+    <h1>Your profile</h1>
+    <img class="user-img" src=<%= user.getPic() %>>
+    <p>Username:<%= user.getName() %></p>
+    <p>Email:<%= user.getEmail() %></p>
+    <p>Country:<%= user.getCountry() %></p>
+    <p>Gender:<%= user.getGender() %></p>
+    <p>Birthday:<%= user.getDOB() %></p>
+    <br>
+    <p>Diet:<%= user.getDiet() %></p>
+    <p>Allergens:<%= user.getAllergens() %></p>
+    <br>
+    <%
     if (reviewsObject instanceof Map) {
         Map<String, Object> result = (Map<String, Object>) reviewsObject;
         List<Review> userReviews = (List<Review>) result.get("reviews");
         List<Date> reviewDates = (List<Date>) result.get("reviewDates");
-%>
-<h1>Your profile</h1>
-<img class="user-img" src=<%= user.getPic() %>>
-<p>Username:<%= user.getName() %></p>
-<p>Email:<%= user.getEmail() %></p>
-<p>Country:<%= user.getCountry() %></p>
-<p>Gender:<%= user.getGender() %></p>
-<p>Birthday:<%= user.getDOB() %></p>
-<br>
-<p>Diet:<%= user.getDiet() %></p>
-<p>Allergens:<%= user.getAllergens() %></p>
-<br>
-<p>Your last reviews:</p>
-<%
-    for (int i = 0; i < userReviews.size(); i++) {
-        Review review = userReviews.get(i);
-        Date date = reviewDates.get(i);
-%>
-    <p>Review: <%= review.getReviewText() %></p>
-    <p>Date: <%= new SimpleDateFormat("dd MMMM yyyy").format(date) %></p>
-<%
-    }
-%>
 
-<input type="submit" value="Edit Profile">
-
-<%
+        if (!userReviews.isEmpty()) {
+    %>
+            <p>Your last reviews:</p>
+            <%
+            for (int i = 0; i < userReviews.size(); i++) {
+                Review review = userReviews.get(i);
+                Date date = reviewDates.get(i);
+            %>
+                <p>Review: <%= review.getReviewText() %></p>
+                <p>Date: <%= new SimpleDateFormat("dd MMMM yyyy").format(date) %></p>
+            <%
+            }
+            %>
+    <%
+        } else {
+    %>
+            <p>No reviews available.</p>
+    <%
+        }
+    } else {
+    %>
+        <p>Error retrieving reviews. Please try again later.</p>
+    <%
     }
-%>
+    %>
+    <input type="submit" value="Edit Profile">
 </body>
 </html>
