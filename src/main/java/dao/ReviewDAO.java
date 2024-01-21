@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class ReviewDAO {
 
         // Check if there are no reviews
         if (userReviews.isEmpty()) {
-            return "You don't have any reviews yet.";
+            return Collections.emptyMap(); 
         }
 
         // Sort the reviews by date in descending order

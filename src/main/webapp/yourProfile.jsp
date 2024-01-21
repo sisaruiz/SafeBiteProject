@@ -36,12 +36,10 @@
     <p>Allergens:<%= user.getAllergens() %></p>
     <br>
     <%
-    if (reviewsObject instanceof Map) {
+    if (reviewsObject != null && !((Map<?, ?>) reviewsObject).isEmpty()) {
         Map<String, Object> result = (Map<String, Object>) reviewsObject;
         List<Review> userReviews = (List<Review>) result.get("reviews");
         List<Date> reviewDates = (List<Date>) result.get("reviewDates");
-
-        if (!userReviews.isEmpty()) {
     %>
             <p>Your last reviews:</p>
             <%
@@ -55,14 +53,9 @@
             }
             %>
     <%
-        } else {
-    %>
-            <p>No reviews available.</p>
-    <%
-        }
     } else {
     %>
-        <p>Error retrieving reviews. Please try again later.</p>
+        <p>No reviews yet.</p>
     <%
     }
     %>
