@@ -66,6 +66,9 @@
     <%
     }
     %>
+    <form action="editProfile.jsp">
     <input type="submit" value="Edit Profile">
+</form>
+
 </body>
 </html>
