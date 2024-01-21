@@ -69,8 +69,8 @@ public class Review {
     }
 
     // Getter and Setter for 'reviewRating'
-    public String getReviewRating() {
-        return reviewRating.toString();
+    public Integer getReviewRating() {
+        return reviewRating;
     }
 
     public void setReviewRating(Integer reviewRating) {

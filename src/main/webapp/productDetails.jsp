@@ -69,7 +69,7 @@
 		                    <li>
 		                    	User: <%= review.getUsername() %><br>
 		                    	Date: <%= review.getReviewDate() %><br>
-		                        Rating: <%= review.getReviewRating() %><br>
+		                        Rating: <%= review.getReviewRating().toString() %><br>
 		                        Heading: <%= review.getReviewHeading() %><br>
 		                        Text: <%= review.getReviewText() %><br>
 		                    </li>
