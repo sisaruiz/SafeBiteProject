@@ -1,9 +1,10 @@
 package model;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
+import dao.ReviewDAO;
 import utilities.Constants;
 
 public class Product {
@@ -85,6 +86,13 @@ public class Product {
     	this.name = name;
         this.imgURL = imgURL;
         this.productURL = Constants.BASE_URL + id;
+    }
+    
+ // Add this method to your Product class
+    public List<Review> getReviews() {
+        // Use the product ID to fetch reviews from the ReviewDAO
+        ReviewDAO reviewDAO = new ReviewDAO();
+        return reviewDAO.getReviewsByProductId(this.id);
     }
     
     // Helper method to convert Date to String

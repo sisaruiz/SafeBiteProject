@@ -9,6 +9,7 @@ import com.mongodb.client.model.Filters;
 import model.Review;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +28,24 @@ public class ReviewDAO {
         // Set up MongoDB connection and get the review collection
         this.mongoClient = MongoClients.create("mongodb://localhost:27017");
         this.reviewCollection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
+    }
+    
+    public List<Review> getReviewsByProductId(String productId) {
+        List<Review> reviews = new ArrayList<>();
+
+        try (MongoCursor<Document> cursor = reviewCollection.find(Filters.eq("Product ID", new ObjectId(productId))).iterator()) {
+            while (cursor.hasNext()) {
+                Document reviewDoc = cursor.next();
+                Review review = documentToReview(reviewDoc);
+                reviews.add(review);
+            }
+        } catch (Exception e) {
+            // Handle exceptions appropriately (e.g., log the error, throw an exception)
+            e.printStackTrace();
+            // You might want to throw an exception here or return an empty list
+        }
+
+        return reviews;
     }
 
     public Object getLastThreeReviewsWithDates(String username) {
@@ -86,7 +105,12 @@ public class ReviewDAO {
         String username = document.getString("User");
         String reviewText = document.getString("Review Text");
         String reviewDateString = document.getString("Review Date");
+        String reviewHeading = document.getString("Review Heading");
+        Integer reviewRating = document.getInteger("Review Rating");
+        String productName = document.getString("Product Name");
+        ObjectId productID = document.getObjectId("Product ID");
 
-        return new Review(username, reviewText, reviewDateString);
+        return new Review(username, productName, productID, reviewText, reviewDateString,
+        		reviewHeading, reviewRating);
     }
 }

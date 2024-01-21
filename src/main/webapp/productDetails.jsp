@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" %>
 <%@ page import="dao.ProductDAO" %>
 <%@ page import="model.Product" %>
+<%@ page import="model.Review" %>
+<%@ page import="java.util.List" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,7 +59,29 @@
 			Text:		<input type="text" name="r_text">
 				<input type=submit value=Insert>		<input type=reset>
 </pre>
-</form>
+			</form>
+			<br>
+			<ul>
+		        <% List<Review> reviews = product.getReviews();
+		           if (!reviews.isEmpty()) {
+		               for (Review review : reviews) {
+		        %>
+		                    <li>
+		                    	User: <%= review.getUsername() %><br>
+		                    	Date: <%= review.getReviewDate() %><br>
+		                        Rating: <%= review.getReviewRating() %><br>
+		                        Heading: <%= review.getReviewHeading() %><br>
+		                        Text: <%= review.getReviewText() %><br>
+		                    </li>
+		        <%
+		               }
+		           } else {
+		        %>
+		                <p>No reviews for this product yet.</p>
+		        <%
+		           }
+		        %>
+		    </ul>
 			</section>
 
     <%
