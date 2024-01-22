@@ -69,4 +69,14 @@
     <servlet-name>UpdateProfileServlet</servlet-name>
     <url-pattern>/UpdateProfileServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SearchUsersServlet</display-name>
+    <servlet-name>SearchUsersServlet</servlet-name>
+    <servlet-class>search.SearchUsersServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SearchUsersServlet</servlet-name>
+    <url-pattern>/SearchUsersServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

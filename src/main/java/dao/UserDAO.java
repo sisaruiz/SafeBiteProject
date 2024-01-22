@@ -7,6 +7,10 @@ import com.mongodb.client.MongoDatabase;
 
 import model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.bson.Document;
 
 public class UserDAO {
@@ -30,6 +34,35 @@ public class UserDAO {
             return user;
         }
         return null;
+    }
+    
+    
+    public List<User> searchUsers(String searchTerm) {
+        List<User> users = new ArrayList<>();
+
+        // Ensure usersCollection is not null
+        if (usersCollection != null) {
+            try {
+                // Query the 'Products' collection for matching documents
+                Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
+                Document query = new Document("user_name", pattern);
+                System.out.println("Constructed MongoDB Query: " + query.toJson());
+
+                for (Document userDoc : usersCollection.find(query)) {
+                    String userName = userDoc.getString("user_name");
+                    // Create a Product instance
+                    User user = new User(userName);
+                    users.add(user);
+                }
+            } catch (Exception e) {
+                System.out.println("Error executing search query:");
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("usersCollection is null. Check MongoDB connection.");
+        }
+
+        return users;
     }
     
     public void updateUserProfile(User user) {

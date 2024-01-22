@@ -12,4 +12,8 @@ public class Account {
 		email = em;
 		psw = ps;
 	}
+	
+	public Account(String us) {
+		username = us;
+	}
 }

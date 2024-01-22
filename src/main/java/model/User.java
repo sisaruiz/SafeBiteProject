@@ -22,6 +22,10 @@ public class User extends Account {
 		this.allergens = l;		
 	}
 	
+	public User(String us) {
+		super(us);	
+	}
+	
 	// Getters
     public String getName() {
         return this.username;

@@ -43,14 +43,17 @@
         List<Review> userReviews = (List<Review>) result.get("reviews");
         List<Date> reviewDates = (List<Date>) result.get("reviewDates");
     %>
-            <p>Your last reviews:</p>
+            <p><strong>Your last reviews</strong></p>
             <%
             for (int i = 0; i < userReviews.size(); i++) {
                 Review review = userReviews.get(i);
                 Date date = reviewDates.get(i);
             %>
+            	<p>Product: <%= review.getProductName() %></p>
+            	<p>Date: <%= new SimpleDateFormat("dd MMMM yyyy").format(date) %></p>
+       			<p>Heading: <%= review.getReviewHeading() %></p>
                 <p>Review: <%= review.getReviewText() %></p>
-                <p>Date: <%= new SimpleDateFormat("dd MMMM yyyy").format(date) %></p>
+                <br>
             <%
             }
             %>
