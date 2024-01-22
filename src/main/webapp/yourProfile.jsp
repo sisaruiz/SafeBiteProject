@@ -35,6 +35,8 @@
     <p>Diet:<%= user.getDiet() %></p>
     <p>Allergens:<%= user.getAllergens() %></p>
     <br>
+    <a href="editProfile.jsp">Edit Profile</a>
+    <br>
     <%
     if (reviewsObject != null && !((Map<?, ?>) reviewsObject).isEmpty()) {
         Map<String, Object> result = (Map<String, Object>) reviewsObject;
@@ -59,9 +61,6 @@
     <%
     }
     %>
-    <form action="editProfile.jsp">
-    <input type="submit" value="Edit Profile">
-</form>
 
 </body>
 </html>

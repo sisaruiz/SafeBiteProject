@@ -31,4 +31,18 @@ public class UserDAO {
         }
         return null;
     }
+    
+    public void updateUserProfile(User user) {
+        // Assuming 'user_name' is the unique identifier in your MongoDB collection
+        Document query = new Document("user_name", user.getName());
+
+        // Create an update document with the modified user information
+        Document update = new Document("$set", new Document()
+                .append("diet_type", user.getDiet())
+                .append("allergy", new Document("allergens", user.getListAllergens())));
+
+        // Update the document in the MongoDB collection
+        usersCollection.updateOne(query, update);
+    }
+
 }

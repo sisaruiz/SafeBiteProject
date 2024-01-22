@@ -60,6 +60,10 @@ public class User extends Account {
         return result;
     }
     
+    public List<String> getListAllergens() {
+    	return this.allergens;
+    }
+    
     // Setters
     public void setName(String s) {
         this.username = s;
