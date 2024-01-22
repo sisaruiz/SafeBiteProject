@@ -10,6 +10,7 @@ b. Admin
 - users catalogue: delete user
 
 a. upload data onto Neo4j
+
 b. implement queries for:
 - product recommendation
 - user recommendation
