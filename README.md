@@ -3,6 +3,7 @@ To do:
 a. User
 - follow/unfollow user
 - like product
+
 b. Admin
 - admin home interface
 - products catalogue: add/remove/update product, remove review.
