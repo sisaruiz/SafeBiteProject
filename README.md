@@ -1,6 +1,7 @@
 # TO DO:
 
 a. User
+- add profile page for users
 - follow/unfollow user
 - like product
 
