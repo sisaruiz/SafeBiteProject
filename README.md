@@ -9,15 +9,16 @@ b. Admin
 - products catalogue: add/remove/update product, remove review.
 - users catalogue: delete user
 
-a. upload data onto Neo4j
+c. upload data onto Neo4j
 
-b. implement queries for:
+d. implement queries for:
 - product recommendation
 - user recommendation
   
-a. implement queries on mongoDB
-b. display results
+e. implement queries on mongoDB
 
-make it beautiful
+f. display results
 
-upload dataset onto virtual machines and make it work
+g. make it beautiful
+
+h. upload dataset onto virtual machines and make it work
