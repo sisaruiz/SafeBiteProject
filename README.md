@@ -1,7 +1,6 @@
 # TO DO:
 
 a. User
-- add 'befriend' user
 - like product
 
 b. Admin
