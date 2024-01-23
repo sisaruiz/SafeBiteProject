@@ -1,8 +1,7 @@
 # TO DO:
 
 a. User
-- add profile page for users
-- follow/unfollow user
+- add 'befriend' user
 - like product
 
 b. Admin
