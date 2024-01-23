@@ -30,7 +30,8 @@ public class UserDAO {
             User user = new User(username, userDocument.getString("email"), userDocument.getString("password"),
             		"https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
             		userDocument.getString("country"), userDocument.getString("date_of_birth"), userDocument.getString("gender"),
-            		userDocument.getString("diet_type"), userDocument.get("allergy", Document.class).getList("allergens", String.class));
+            		userDocument.getString("diet_type"), userDocument.getList("friends", String.class) , 
+            		userDocument.get("allergy", Document.class).getList("allergens", String.class));
             return user;
         }
         return null;
@@ -77,5 +78,34 @@ public class UserDAO {
         // Update the document in the MongoDB collection
         usersCollection.updateOne(query, update);
     }
+    
+    public void addFriend(String user1Username, String user2Username) {
+    	updateFriendsListInDatabase(user1Username, user2Username);
+        updateFriendsListInDatabase(user2Username, user1Username);
+    }
 
+    private void updateFriendsListInDatabase(String username, String friendUsername) {
+        // Assuming 'user_name' is the unique identifier in your MongoDB collection
+        Document query = new Document("user_name", username);
+
+        // Add friend to the friends list if not already present
+        Document update = new Document("$addToSet", new Document("friends", friendUsername));
+
+        // Update the document in the MongoDB collection
+        usersCollection.updateOne(query, update);
+    }
+    
+    public boolean areFriends(String user1, String user2) {
+        try {
+            // Assuming you have a method to get a user by username
+            User user = getUserByUsername(user1);
+
+            // Check if user2 is in the friends list of user1
+            return user.getFriends() != null && user.getFriends().contains(user2);
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

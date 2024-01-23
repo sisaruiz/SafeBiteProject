@@ -30,6 +30,20 @@
 	<p>Diet:<%= user.getDiet() %></p>
     <p>Allergens:<%= user.getAllergens() %></p>
     <br>
+    
+    <%
+	    String visitorUsername = (String) request.getSession().getAttribute("uname");
+	    boolean areFriends = userDAO.areFriends(visitorUsername, user.getName());
+	%>
+	<form action="FriendServlet" method="post">
+	    <input type="hidden" name="userToAdd" value="<%= user.getName() %>">
+    <% if (areFriends) { %>
+        <input type="button" value="Already friends" disabled>
+    <% } else { %>
+        <input type="submit" value="Be friend">
+    <% } %>
+	</form>
+    <br>
     <%
     if (reviewsObject != null && !((Map<?, ?>) reviewsObject).isEmpty()) {
         Map<String, Object> result = (Map<String, Object>) reviewsObject;

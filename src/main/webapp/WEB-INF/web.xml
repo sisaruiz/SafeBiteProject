@@ -79,4 +79,14 @@
     <servlet-name>SearchUsersServlet</servlet-name>
     <url-pattern>/SearchUsersServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>FriendServlet</display-name>
+    <servlet-name>FriendServlet</servlet-name>
+    <servlet-class>friend.FriendServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FriendServlet</servlet-name>
+    <url-pattern>/FriendServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

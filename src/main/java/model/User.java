@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User extends Account {
@@ -10,16 +11,18 @@ public class User extends Account {
 	String gender;
 	String diet;
 	List<String> allergens;
+	List<String> friends;
 	
 	public User(String us, String em, String ps, String picURL,	String country, String dateOfBirth,
-			String gender, String diet, List<String> l ) {
+			String gender, String diet, List<String> f, List<String> l ) {
 		super(us, em, ps);
 		this.picURL = picURL;
 		this.country = country;
 		this.dateOfBirth = dateOfBirth;
 		this.gender = gender;
 		this.diet = diet;
-		this.allergens = l;		
+		this.allergens = l;
+		this.friends = f;
 	}
 	
 	public User(String us) {
@@ -95,5 +98,14 @@ public class User extends Account {
 
     public void setAllergens(List<String> l) {
     	this.allergens = l;
-    }	
+    }
+    
+    public List<String> getFriends() {
+        return this.friends != null ? this.friends : new ArrayList<>();
+    }
+
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
+    }
+
 }
