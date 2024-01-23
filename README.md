@@ -1,7 +1,7 @@
 # TO DO:
 
 a. User
-- follow/unfollow user
+- add 'befriend' user
 - like product
 
 b. Admin
