@@ -1,12 +1,13 @@
 # TO DO:
 
-a. User
-- like product
-
-b. Admin
+a. Admin
 - admin home interface
 - products catalogue: add/remove/update product, remove review.
 - users catalogue: delete user
+
+b. User
+- revamp "add friend" functionality (node4j)
+- like product (node4j)
 
 c. upload data onto Neo4j
 
