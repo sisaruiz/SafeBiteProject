@@ -47,7 +47,17 @@ public class LoginServlet extends HttpServlet {
             // Authentication successful
         	HttpSession hs=request.getSession();
 			hs.setAttribute("uname", n);
-			response.sendRedirect("home.jsp");
+			
+			// Check if user or admin
+			Boolean admin = user.getBoolean("admin");
+			hs.setAttribute("admin", admin);
+			if (admin) {
+				response.sendRedirect("adminHome.jsp");
+			}
+			else {
+				response.sendRedirect("home.jsp");
+			}
+			
         } else {
             // Authentication failed
         	out.println("Sorry! username or password incorrect ... Try again!");
