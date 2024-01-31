@@ -1,7 +1,7 @@
 # TO DO:
 
 a. Admin
-- admin home interface
+- ~admin home interface~
 - products catalogue: add/remove/update product, remove review.
 - users catalogue: delete user
 
