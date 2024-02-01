@@ -163,14 +163,19 @@ public class Product {
 
     public Date getEntryTS() {
     	return entryTimestamp;
-        //return convertDateToString(entryTimestamp);
     }
-
+    
     public Date getLastUpdateTS() {
     	return lastUpdateTimestamp;
-        //return convertDateToString(lastUpdateTimestamp);
     }
-
+    
+    public String getStringLastUpdateTS() {
+    	return convertDateToString(lastUpdateTimestamp);
+    }
+    
+    public String getStringEntryTS() {
+    	return convertDateToString(entryTimestamp);
+    }
     
     // Setters
     public void setName(String name) {

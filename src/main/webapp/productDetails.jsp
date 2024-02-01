@@ -36,11 +36,11 @@
 			<p>Countries: <%= product.getCountries() != null ? product.getCountries() : "not available" %></p>
 			
 			<!-- Entry log -->
-			<p>Entry Timestamp: <%= product.getEntryTS() != null ? product.getEntryTS() : "not available" %></p>
+			<p>Entry Timestamp: <%= product.getStringEntryTS() != null ? product.getStringEntryTS() : "not available" %></p>
 			
 			<!-- Last update -->
 			<p>Last Update By: <%= product.getLastUpdateBy() != null ? product.getLastUpdateBy() : "not available" %></p>
-			<p>Last Update Timestamp: <%= product.getLastUpdateTS() != null ? product.getLastUpdateTS() : "not available" %></p>
+			<p>Last Update Timestamp: <%= product.getStringLastUpdateTS() != null ? product.getStringLastUpdateTS() : "not available" %></p>
 			
 			<section>
 			<h3>Reviews</h3>
