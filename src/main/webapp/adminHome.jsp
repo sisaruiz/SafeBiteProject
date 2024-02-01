@@ -29,7 +29,7 @@ Welcome, <%=session.getAttribute("uname")%>
 		Brand Owner:	<input type="text" name="bowner">
 		Categories:		<input type="text" name="categories">
 		Countries:		<input type="text" name="countries">
-		Labels:			<input type="text" name="countries">
+		Labels:			<input type="text" name="labels">
 		Quantity:		<input type="text" name="quantity">
 		Traces:			<input type="text" name="traces">
 		<input type=submit value="Add product">		<input type=reset>

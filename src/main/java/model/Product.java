@@ -161,12 +161,14 @@ public class Product {
         return lastUpdateBy;
     }
 
-    public String getEntryTS() {
-        return convertDateToString(entryTimestamp);
+    public Date getEntryTS() {
+    	return entryTimestamp;
+        //return convertDateToString(entryTimestamp);
     }
 
-    public String getLastUpdateTS() {
-        return convertDateToString(lastUpdateTimestamp);
+    public Date getLastUpdateTS() {
+    	return lastUpdateTimestamp;
+        //return convertDateToString(lastUpdateTimestamp);
     }
 
     

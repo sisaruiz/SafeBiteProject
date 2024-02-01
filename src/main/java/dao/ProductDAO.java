@@ -106,4 +106,33 @@ public class ProductDAO {
             return null;
         }
     }
+    
+ // Method to add a new product to the MongoDB dataset
+    public void addProduct(Product product) {
+        try {
+            // Convert Product object to Document
+            Document productDoc = new Document("product_name", product.getName())
+                    .append("image_url", product.getImgURL())
+                    .append("ingredients_tags", product.getIngredients())
+                    .append("allergens", product.getAllergens())
+                    .append("brands", product.getBrand())
+                    .append("brand_owner", product.getBrandOwner())
+                    .append("categories_tags", product.getCategories())
+                    .append("countries_en", product.getCountries())
+                    .append("labels_tags", product.getLabels())
+                    .append("quantity", product.getQuantity())
+                    .append("traces_tags", product.getTraces())
+                    .append("created_datetime", product.getEntryTS())
+                    .append("last_modified_datetime", product.getLastUpdateTS())
+                    .append("last_modified_by", product.getLastUpdateBy());
+
+            // Insert the document into the 'Products' collection
+            productsCollection.insertOne(productDoc);
+
+            System.out.println("Product added successfully!");
+        } catch (Exception e) {
+            System.out.println("Error adding product to MongoDB:");
+            e.printStackTrace();
+        }
+    }
 }

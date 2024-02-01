@@ -89,4 +89,14 @@
     <servlet-name>FriendServlet</servlet-name>
     <url-pattern>/FriendServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>InsertProductServlet</display-name>
+    <servlet-name>InsertProductServlet</servlet-name>
+    <servlet-class>product.InsertProductServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>InsertProductServlet</servlet-name>
+    <url-pattern>/InsertProductServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
