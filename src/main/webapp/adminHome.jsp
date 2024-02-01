@@ -16,6 +16,11 @@
 <h2>
 Welcome, <%=session.getAttribute("uname")%>
 </h2>
+<br>
+<form action="logout.jsp">
+    <input type="submit" value="Logout">
+</form>
+<br>
 <section>
 <h3>Products</h3>
 <p>Add product</p>
