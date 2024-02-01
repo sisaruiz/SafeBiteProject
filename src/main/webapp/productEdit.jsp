@@ -29,6 +29,9 @@
 				    <label for="productName">Product Name:</label>
 				    <input type="text" id="productName" name="productName" value="<%= product.getName() != null ? product.getName() : "" %>">
 				    
+				    <label for="productImg">Image URL:</label>
+				    <input type="text" id="imgURL" name="imgURL" value="<%= product.getImgURL() != null ? product.getImgURL() : "" %>">
+				    
 				    <label for="quantity">Quantity:</label>
 				    <input type="text" id="quantity" name="quantity" value="<%= product.getQuantity() != null ? product.getQuantity() : "" %>">
 				    
@@ -55,15 +58,6 @@
 				    
 				    <label for="countries">Countries:</label>
 				    <input type="text" id="countries" name="countries" value="<%= product.getCountries() != null ? product.getCountries() : "" %>">
-				    
-				    <label for="entryTimestamp">Entry Timestamp:</label>
-				    <input type="text" id="entryTimestamp" name="entryTimestamp" value="<%= product.getStringEntryTS() != null ? product.getStringEntryTS() : "" %>">
-				    
-				    <label for="lastUpdateBy">Last Update By:</label>
-				    <input type="text" id="lastUpdateBy" name="lastUpdateBy" value="<%= product.getLastUpdateBy() != null ? product.getLastUpdateBy() : "" %>">
-				    
-				    <label for="lastUpdateTimestamp">Last Update Timestamp:</label>
-				    <input type="text" id="lastUpdateTimestamp" name="lastUpdateTimestamp" value="<%= product.getStringLastUpdateTS() != null ? product.getStringLastUpdateTS() : "" %>">
 				    
 				    <!-- Submit button to save changes -->
 				    <input type="submit" value="Save Changes">

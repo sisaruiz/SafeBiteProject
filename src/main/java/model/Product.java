@@ -185,4 +185,48 @@ public class Product {
     public void setImgURL(String imgURL) {
         this.imgURL = imgURL;
     }
+    
+    public void setQuantity(String q) {
+        this.quantity = q;
+    }
+    
+    public void setIngredients(String i) {
+        this.ingredients = i;
+    }
+    
+    public void setAllergens(String a) {
+        this.allergens = a;
+    }
+    
+    public void setTraces(String t) {
+        this.traces = t;
+    }
+    
+    public void setLabels(String l) {
+        this.labels = l;
+    }
+    
+    public void setCategories(String c) {
+        this.categories = c;
+    }
+    
+    public void setBrandOwner(String bo) {
+        this.brandOwner = bo;
+    }
+    
+    public void setBrand(String b) {
+        this.brand = b;
+    }
+    
+    public void setCountries(String c) {
+        this.countries = c;
+    }
+    
+    public void setLUB(String un) {
+        this.lastUpdateBy = un;
+    }
+    
+    public void setLUTS(Date d) {
+        this.lastUpdateTimestamp = d;
+    }
 }

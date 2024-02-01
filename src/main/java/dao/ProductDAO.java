@@ -14,6 +14,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.UpdateResult;
 
 public class ProductDAO {
 	
@@ -88,7 +89,7 @@ public class ProductDAO {
             String brands = productDoc.getString("brands");
             String countries = productDoc.getString("countries_en");
             Date entryTS = productDoc.getDate("created_datetime");
-            String categories = productDoc.getString("food_groups_en");
+            String categories = productDoc.getString("food_groups_en") != null ? productDoc.getString("food_groups_en") : productDoc.getString("categories_tags");
             String ingredients = productDoc.getString("ingredients_tags");
             String labels = productDoc.getString("labels_tags");
             Date updateTS = productDoc.getDate("last_modified_datetime");
@@ -132,6 +133,41 @@ public class ProductDAO {
             System.out.println("Product added successfully!");
         } catch (Exception e) {
             System.out.println("Error adding product to MongoDB:");
+            e.printStackTrace();
+        }
+    }
+    
+    public void updateProduct(Product product) {
+        try {
+            // Convert Product object to Document
+            Document updateDoc = new Document("$set", new Document("product_name", product.getName())
+                    .append("image_url", product.getImgURL())
+                    .append("ingredients_tags", product.getIngredients())
+                    .append("allergens", product.getAllergens())
+                    .append("brands", product.getBrand())
+                    .append("brand_owner", product.getBrandOwner())
+                    .append("categories_tags", product.getCategories())
+                    .append("countries_en", product.getCountries())
+                    .append("labels_tags", product.getLabels())
+                    .append("quantity", product.getQuantity())
+                    .append("traces_tags", product.getTraces())
+                    .append("last_modified_datetime", new Date())
+                    .append("last_modified_by", product.getLastUpdateBy()));
+
+            // Construct the query to find the product by ObjectId
+            Document query = new Document("_id", new ObjectId(product.getId()));
+
+            // Update the document in the 'Products' collection
+            UpdateResult updateResult = productsCollection.updateOne(query, updateDoc);
+
+            // Check if the update was successful
+            if (updateResult.getModifiedCount() > 0) {
+                System.out.println("Product updated successfully!");
+            } else {
+                System.out.println("Product update failed. Product not found for ID: " + product.getId());
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating product in MongoDB:");
             e.printStackTrace();
         }
     }
