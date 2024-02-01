@@ -109,4 +109,14 @@
     <servlet-name>UpdateProductServlet</servlet-name>
     <url-pattern>/UpdateProductServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeleteProductServlet</display-name>
+    <servlet-name>DeleteProductServlet</servlet-name>
+    <servlet-class>product.DeleteProductServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteProductServlet</servlet-name>
+    <url-pattern>/DeleteProductServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

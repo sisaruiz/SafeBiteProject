@@ -14,6 +14,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 public class ProductDAO {
@@ -171,4 +172,29 @@ public class ProductDAO {
             e.printStackTrace();
         }
     }
+
+	public void deleteProduct(String productId) {
+		// TODO Auto-generated method stub
+		try {
+            // Convert the string representation of ObjectId to ObjectId
+            ObjectId objectId = new ObjectId(productId);
+
+            // Construct the query to find the product by ObjectId
+            Document query = new Document("_id", objectId);
+
+            // Delete the document from the 'Products' collection
+            DeleteResult deleteResult = productsCollection.deleteOne(query);
+
+            // Check if the deletion was successful
+            if (deleteResult.getDeletedCount() > 0) {
+                System.out.println("Product deleted successfully!");
+            } else {
+                System.out.println("Product deletion failed. Product not found for ID: " + productId);
+            }
+        } catch (Exception e) {
+            System.out.println("Error deleting product from MongoDB:");
+            e.printStackTrace();
+        }
+		
+	}
 }
