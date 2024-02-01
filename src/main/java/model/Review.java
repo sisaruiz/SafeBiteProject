@@ -3,6 +3,8 @@ package model;
 import org.bson.types.ObjectId;
 
 public class Review {
+	
+	private ObjectId reviewID;
     private String username;
     private String reviewText;
     private String reviewHeading;
@@ -19,9 +21,22 @@ public class Review {
         this.reviewDate = reviewDate;
     }
 
-    public Review(String username, String productName, ObjectId productID, String reviewText, String reviewDate, 
+    public Review(ObjectId revId, String username, String productName, ObjectId productID, String reviewText, String reviewDate, 
     		String reviewHeading, Integer reviewRating) {
     	
+    	this.reviewID = revId;
+        this.username = username;
+        this.productID = productID;
+        this.reviewText = reviewText;
+        this.reviewDate = reviewDate;
+        this.productName = productName;
+        this.reviewHeading = reviewHeading;
+        this.reviewRating = reviewRating;  
+    }
+    
+    public Review( String username, String productName, ObjectId productID, String reviewText, String reviewDate, 
+    		String reviewHeading, Integer reviewRating) {
+
         this.username = username;
         this.productID = productID;
         this.reviewText = reviewText;
@@ -32,7 +47,7 @@ public class Review {
     }
 
     
- // Getter and Setter for 'username'
+    // Getter and Setter for 'username'
     public String getUsername() {
         return username;
     }
@@ -85,6 +100,16 @@ public class Review {
     public void setProductName(String productName) {
         this.productName = productName;
     }
+    
+    // Getter and Setter for 'reviewId'
+    public ObjectId getReviewId() {
+        return reviewID;
+    }
+
+    public void setReviewId(ObjectId reviewId) {
+        this.reviewID = reviewId;
+    }
+
     
     public ObjectId getProductID() {
         return productID;

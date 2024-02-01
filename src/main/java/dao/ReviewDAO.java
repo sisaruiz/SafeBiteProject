@@ -103,6 +103,7 @@ public class ReviewDAO {
     }        
 
     private Review documentToReview(Document document) {
+    	ObjectId revID = document.getObjectId("_id");
         String username = document.getString("User");
         String reviewText = document.getString("Review Text");
         String reviewDateString = document.getString("Review Date");
@@ -111,7 +112,7 @@ public class ReviewDAO {
         String productName = document.getString("Product Name");
         ObjectId productID = document.getObjectId("Product ID");
 
-        return new Review(username, productName, productID, reviewText, reviewDateString,
+        return new Review(revID, username, productName, productID, reviewText, reviewDateString,
         		reviewHeading, reviewRating);
     }
 }

@@ -71,12 +71,21 @@
             <div class="product-container">
     			<img class="product-image" src="<%= product.getImgURL() %>">
     				<p>
-        			<a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+    				<%
+	    				if((Boolean)session.getAttribute("admin")==false){ %>
+	    					<a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+    				<%  }
+	    				else{ %>
+    						<a href="productEdit.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+    				<%
+    					}
+    				%>
     				</p>
 			</div>
-        <%
-                }
-            } else {
+        	<%
+            	}
+            }
+            else {
         %>
             <p>No products found matching your search term.</p>
         <%
