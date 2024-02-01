@@ -115,4 +115,17 @@ public class ReviewDAO {
         return new Review(revID, username, productName, productID, reviewText, reviewDateString,
         		reviewHeading, reviewRating);
     }
+    
+    public void deleteReviewById(String reviewId) {
+        try {
+            // Convert reviewId to ObjectId
+            ObjectId objectId = new ObjectId(reviewId);
+
+            // Delete the review by its ID
+            reviewCollection.deleteOne(Filters.eq("_id", objectId));
+        } catch (Exception e) {
+            // Handle exceptions appropriately (e.g., log the error, throw an exception)
+            e.printStackTrace();
+        }
+    }
 }

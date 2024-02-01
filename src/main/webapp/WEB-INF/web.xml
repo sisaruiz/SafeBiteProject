@@ -119,4 +119,14 @@
     <servlet-name>DeleteProductServlet</servlet-name>
     <url-pattern>/DeleteProductServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeleteReviewServlet</display-name>
+    <servlet-name>DeleteReviewServlet</servlet-name>
+    <servlet-class>review.DeleteReviewServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteReviewServlet</servlet-name>
+    <url-pattern>/DeleteReviewServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -95,7 +95,8 @@
                                 <span><%= review.getReviewText() %></span>
 
                                 <!-- Delete Review -->
-                                <form action="DeleteReviewServlet?reviewId=<%review.getReviewId(); %>" method="post">
+                                <form action="DeleteReviewServlet?reviewId=<%= review.getReviewId() %>" method="post">
+                                	<input type="hidden" name="productId" value="<%= productId %>">
                                     <input type="submit" value="Delete Review">
                                 </form>
                             </li>
