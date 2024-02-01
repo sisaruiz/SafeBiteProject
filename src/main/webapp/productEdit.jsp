@@ -69,7 +69,7 @@
 				    <input type="submit" value="Save Changes">
 				</form>
 
-                
+                <br>
                 <!-- Delete Product -->
                 <form action="DeleteProductServlet?productId=<%= productId %>" method="post">
                     <input type="submit" value="Delete Product">
@@ -84,33 +84,21 @@
                         for (Review review : reviews) {
                     %>
                             <li>
-                                <!-- Edit Review Form -->
-								<form action="UpdateReviewServlet?reviewId=<%= review.getReviewId() %>" method="post">
-								    <!-- Editable input fields for updating review details -->
-								    <label for="r_score">Rating:</label>
-								    <select id="r_score" name="r_score">
-								        <option value="1" <%= review.getReviewRating() == 1 ? "selected" : "" %>>1</option>
-								        <option value="2" <%= review.getReviewRating() == 2 ? "selected" : "" %>>2</option>
-									    <option value="3" <%= review.getReviewRating() == 3 ? "selected" : "" %>>3</option>
-									    <option value="4" <%= review.getReviewRating() == 4 ? "selected" : "" %>>4</option>
-									    <option value="5" <%= review.getReviewRating() == 5 ? "selected" : "" %>>5</option>
-								    </select>
-								
-								    <label for="r_heading">Heading:</label>
-								    <input type="text" id="r_heading" name="r_heading" value="<%= review.getReviewHeading() != null ? review.getReviewHeading() : "" %>">
-								
-								    <label for="reviewDate">Date:</label>
-								    <input type="text" id="reviewDate" name="reviewDate" value="<%= review.getReviewDate() != null ? review.getReviewDate() : "" %>">
-								
-								    <label for="username">User:</label>
-								    <input type="text" id="username" name="username" value="<%= review.getUsername() != null ? review.getUsername() : "" %>">
-								
-								    <label for="reviewText">Text:</label>
-								    <textarea id="reviewText" name="reviewText"><%= review.getReviewText() != null ? review.getReviewText() : "" %></textarea>
-								
-								    <!-- Submit button to save changes -->
-								    <input type="submit" value="Save Changes">
-								</form>
+                            
+                            	<label for="r_heading">Heading:</label>
+                                <span><%= review.getReviewHeading() %></span>
+                                
+                                <label for="r_score">Rating:</label>
+                                <span><%= review.getReviewRating() %></span>
+                                    
+                                <label for="reviewDate">Date:</label>
+                                <span><%= review.getReviewDate() %></span>
+                                    
+                                <label for="username">User:</label>
+                                <span><%= review.getUsername() %></span>
+                                    
+                                <label for="reviewText">Text:</label>
+                                <span><%= review.getReviewText() %></span>
 
                                 <!-- Delete Review -->
                                 <form action="DeleteReviewServlet?reviewId=<%review.getReviewId(); %>" method="post">
