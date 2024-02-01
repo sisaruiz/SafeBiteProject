@@ -1,5 +1,6 @@
 package product;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Product;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 
 import dao.ProductDAO;
@@ -22,6 +24,9 @@ public class InsertProductServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
 		
 		// Retrieve data from the form
         String productName = request.getParameter("pname");
@@ -68,8 +73,9 @@ public class InsertProductServlet extends HttpServlet {
         ProductDAO productDAO = new ProductDAO();
         productDAO.addProduct(newProduct);
 
-        // Redirect to a success page or display a success message
-        response.sendRedirect("success.jsp");
+        out.println("Product added correctly.");
+		RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
+		rd.include(request, response);
 	}
 
 }
