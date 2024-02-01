@@ -2,7 +2,7 @@
 
 a. Admin
 - ~admin home interface~
-- products catalogue: add/remove/update product, remove review.
+- products catalogue: ~add~/remove/update product, remove review.
 - users catalogue: delete user
 
 b. User
