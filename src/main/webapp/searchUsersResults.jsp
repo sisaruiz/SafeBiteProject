@@ -2,6 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="dao.UserDAO" %>
 <%@ page import="model.User" %>
+<%@ page import="java.util.Objects" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,29 +11,39 @@
 <body>
     <h1>Search Results</h1>
     <% 
-    	String searchTerm = (String) request.getAttribute("searchTerm");
+        String searchTerm = (String) request.getAttribute("searchTerm");
         UserDAO userDAO = new UserDAO();
         List<User> allUsers = userDAO.searchUsers(request.getParameter("searchTerm"));
         int numberOfResults = allUsers.size();
+        Boolean isAdmin = (Boolean)session.getAttribute("admin");
     %>
 
     <p>Number of results: <%= numberOfResults %></p>
-        <% 
-            if (numberOfResults > 0) {
-                for (int i = 0; i < numberOfResults; i++) {
-                    User user = allUsers.get(i);
-        %>
-    				<p>
-        			<a href="userDetails.jsp?user=<%= user.getName() %>"><%= user.getName() %></a>
-    				</p>
-        <%
-                }
-            } else {
-        %>
-            <p>No users found matching your search term.</p>
-        <%
+    <% 
+        if (numberOfResults > 0) {
+            for (int i = 0; i < numberOfResults; i++) {
+                User user = allUsers.get(i);
+    %>
+                <p>	<% if (isAdmin==false) {%>
+                    <a href="userDetails.jsp?user=<%= user.getName() %>">
+                    <% }%><%= user.getName() %>
+                    <% if (isAdmin==false) {%></a><% }%>
+                    <!-- Display delete button only if admin -->
+                    <% if (Objects.nonNull(isAdmin) && isAdmin) { %>
+                        <form method="post" action="DeleteUserServlet">
+                            <input type="hidden" name="username" value="<%= user.getName() %>">
+                            <input type="submit" value="Delete User">
+                        </form>
+                    <% } %>
+                </p>
+    <%
             }
-        %>
+        } else {
+    %>
+        <p>No users found matching your search term.</p>
+    <%
+        }
+    %>
 
 </body>
 </html>

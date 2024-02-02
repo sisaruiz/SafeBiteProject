@@ -108,4 +108,12 @@ public class UserDAO {
             return false;
         }
     }
+
+    public void deleteUser(String username) {
+        // Assuming 'user_name' is the unique identifier in your MongoDB collection
+        Document query = new Document("user_name", username);
+
+        // Delete the document from the MongoDB collection
+        usersCollection.deleteOne(query);
+    }
 }
