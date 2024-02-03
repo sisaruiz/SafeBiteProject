@@ -8,6 +8,8 @@ a. Admin
 b. User
 - revamp "add friend" functionality (node4j)
 - like product (node4j)
+- follows diet
+- is allergic to
 
 c. upload data onto Neo4j
 
