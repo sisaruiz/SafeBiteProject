@@ -13,15 +13,22 @@ import java.util.regex.Pattern;
 
 import org.bson.Document;
 
+
+
+
 public class UserDAO {
     private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> usersCollection;
+    // Neo4j connection details
+
 
     public UserDAO() {
         mongoClient = MongoClients.create("mongodb://localhost:27017");
         database = mongoClient.getDatabase("SafeBite");
         usersCollection = database.getCollection("Users");
+        
+
     }
 
     public User getUserByUsername(String username) {
@@ -66,6 +73,7 @@ public class UserDAO {
         return users;
     }
     
+    
     public void updateUserProfile(User user) {
         // Assuming 'user_name' is the unique identifier in your MongoDB collection
         Document query = new Document("user_name", user.getName());
@@ -79,11 +87,13 @@ public class UserDAO {
         usersCollection.updateOne(query, update);
     }
     
+    
     public void addFriend(String user1Username, String user2Username) {
     	updateFriendsListInDatabase(user1Username, user2Username);
         updateFriendsListInDatabase(user2Username, user1Username);
     }
 
+    
     private void updateFriendsListInDatabase(String username, String friendUsername) {
         // Assuming 'user_name' is the unique identifier in your MongoDB collection
         Document query = new Document("user_name", username);
