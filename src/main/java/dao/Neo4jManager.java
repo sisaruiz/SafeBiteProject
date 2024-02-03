@@ -12,7 +12,7 @@ public class Neo4jManager {
     private Session neo4jSession;
 
     public Neo4jManager() {
-        neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "your_password"));
+        neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4jneo"));
         neo4jSession = neo4jDriver.session();
     }
 
@@ -38,6 +38,12 @@ public class Neo4jManager {
                 parameters("userName", userName, "dietType", dietType));
     }
 
+    
+    public void deleteNeo4jUserNodes(String userName) {
+        neo4jSession.run("MATCH (u:User {name: $userName}) DETACH DELETE u",
+                parameters("userName", userName));
+    }
+    
     public void closeNeo4jConnection() {
         neo4jSession.close();
         neo4jDriver.close();
