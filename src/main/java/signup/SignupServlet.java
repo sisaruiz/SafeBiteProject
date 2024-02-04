@@ -13,6 +13,9 @@ import java.io.PrintWriter;
 import org.bson.Document;
 
 import com.mongodb.client.*;
+
+import dao.Neo4jManager;
+
 import com.mongodb.ConnectionString;
 
 /**
@@ -64,8 +67,12 @@ public class SignupServlet extends HttpServlet {
             		.append("gender", gender)
             		.append("admin", false);
 
-    		//Insert new user into users dataset
+    		//Insert new user into MongoDB users dataset
             usersCollection.insertOne(newUser);
+            
+            //Insert new user into Neo4j users dataset
+            Neo4jManager neo4jManager = new Neo4jManager();
+            neo4jManager.createNeo4jUserNode(username);
             
             //Save name to associate subsequent diet setup
         	HttpSession hs = request.getSession();

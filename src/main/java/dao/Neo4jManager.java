@@ -12,12 +12,12 @@ public class Neo4jManager {
     private Session neo4jSession;
 
     public Neo4jManager() {
-        neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4jneo"));
+        neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "abcd1234"));
         neo4jSession = neo4jDriver.session();
     }
 
     public void createNeo4jUserNode(String userName) {
-        neo4jSession.run("CREATE (:User {name: $userName})", parameters("userName", userName));
+        neo4jSession.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
     }
 
     public void createNeo4jDietNode(String dietType) {
@@ -29,19 +29,19 @@ public class Neo4jManager {
     }
 
     public void createNeo4jUserAllergyRelationship(String userName, String allergen) {
-        neo4jSession.run("MATCH (u:User {name: $userName}), (a:Allergy {name: $allergen}) CREATE (u)-[:is_allergen_to]->(a)",
+        neo4jSession.run("MATCH (u:User {name: $user_name}), (a:Allergy {name: $allergen}) CREATE (u)-[:is_allergen_to]->(a)",
                 parameters("userName", userName, "allergen", allergen));
     }
 
     public void createNeo4jUserDietRelationship(String userName, String dietType) {
-        neo4jSession.run("MATCH (u:User {name: $userName}), (d:Diet {type: $dietType}) CREATE (u)-[:follows]->(d)",
-                parameters("userName", userName, "dietType", dietType));
+        neo4jSession.run("MATCH (u:User {name: $user_name}), (d:Diet {type: $dietType}) CREATE (u)-[:follows]->(d)",
+                parameters("user_name", userName, "dietType", dietType));
     }
 
     
     public void deleteNeo4jUserNodes(String userName) {
-        neo4jSession.run("MATCH (u:User {name: $userName}) DETACH DELETE u",
-                parameters("userName", userName));
+        neo4jSession.run("MATCH (u:User {name: $user_name}) DETACH DELETE u",
+                parameters("user_name", userName));
     }
     
     public void closeNeo4jConnection() {
