@@ -59,6 +59,10 @@ public class User extends Account {
     }
 
     public String getAllergens() {
+    	
+    	if (this.allergens == null) {
+    		return "";
+    	}
     	List<String> stringList = this.allergens;
 
         // Using System.lineSeparator() as the separator

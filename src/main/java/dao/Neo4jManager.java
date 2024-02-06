@@ -51,15 +51,11 @@ public class Neo4jManager {
     	for (String allergen : allergenNames) {
     	    createNeo4jUserAllergyRelationship(userName, allergen);
     	}
+    }
+    
     public void createNeo4jProductNode(String productId, String productName) {
         neo4jSession.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
     }
-
-    
-    //public void updateNeo4jProductNode(String productId, String productName) {
-     //   neo4jSession.run("MATCH (p:Product {id: $productId}) SET p.name = $productName", parameters("productId", productId, "productName", productName));
-   // }
-    
     
     public void updateNeo4jProductNode(String productId, String productName) {
         try (Transaction transaction = neo4jSession.beginTransaction()) {

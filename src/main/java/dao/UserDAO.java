@@ -34,15 +34,16 @@ public class UserDAO {
     public User getUserByUsername(String username) {
         Document userDocument = usersCollection.find(new Document("user_name", username)).first();
         if (userDocument != null) {
+            Document allergyDocument = userDocument.get("allergy", Document.class);
+            
+            List<String> allergens = (allergyDocument != null) ? allergyDocument.getList("allergens", String.class) : null;
+
             User user = new User(username, userDocument.getString("email"), userDocument.getString("password"),
-            		"https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
-            		userDocument.getString("country"), userDocument.getString("date_of_birth"), userDocument.getString("gender"),
-            		userDocument.getString("diet_type"), userDocument.getList("friends", String.class) , 
-            		userDocument.get("allergy", Document.class).getList("allergens", String.class));
-            
-            // Add the user data to Neo4j
-            createUserInNeo4j(user);
-            
+                    "https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
+                    userDocument.getString("country"), userDocument.getString("date_of_birth"), userDocument.getString("gender"),
+                    userDocument.getString("diet_type"), userDocument.getList("friends", String.class),
+                    allergens);
+
             return user;
         }
         return null;
@@ -106,9 +107,10 @@ public class UserDAO {
         usersCollection.updateOne(query, update);
                        
         neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
-        neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
-
         neo4jManager.deleteNeo4jUserAllergenRelationships(user.getName());
+        
+        neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
+        
         if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
             for (String allergen : user.getListAllergens()) {
                 neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
