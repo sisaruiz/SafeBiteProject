@@ -45,7 +45,6 @@
 	<input type="checkbox" id="peanuts" name="allergens" value="peanuts" /><label for="peanuts">Peanuts</label>
 	<input type="checkbox" id="sesame" name="allergens" value="sesame" /><label for="sesame">Sesame</label>
 	<input type="checkbox" id="rye" name="allergens" value="soy" /><label for="soy">Soy</label>
-	<p>If an allergen is not displayed here you can add it later in your profile settings.</p>
 	<br>
 	<input type=submit value="Set up profile">
 </form>
