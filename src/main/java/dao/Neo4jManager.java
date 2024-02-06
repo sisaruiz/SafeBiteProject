@@ -4,6 +4,7 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
 
 import static org.neo4j.driver.Values.parameters;
 
@@ -50,6 +51,30 @@ public class Neo4jManager {
     	for (String allergen : allergenNames) {
     	    createNeo4jUserAllergyRelationship(userName, allergen);
     	}
+    public void createNeo4jProductNode(String productId, String productName) {
+        neo4jSession.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
+    }
+
+    
+    //public void updateNeo4jProductNode(String productId, String productName) {
+     //   neo4jSession.run("MATCH (p:Product {id: $productId}) SET p.name = $productName", parameters("productId", productId, "productName", productName));
+   // }
+    
+    
+    public void updateNeo4jProductNode(String productId, String productName) {
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (p:Product {id: $productId}) SET p.name = $productName",
+                    parameters("productId", productId, "productName", productName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error updating Neo4j Product Node: " + e.getMessage());
+        }
+    }
+    
+
+    public void deleteNeo4jProductNode(String productId) {
+        neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
     }
     
     public void closeNeo4jConnection() {
