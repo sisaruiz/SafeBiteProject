@@ -12,11 +12,11 @@
 <form action=DietServlet method=post>
     <h3>Diet type</h3>
 	<select id="diet_type" name="diet" required>
-		<option value="None">None</option>
-		<option value="Vegan">Vegan</option>
-		<option value="Vegetarian">Vegetarian</option>
-		<option value="Pescatarian">Pescatarian</option>
-		<option value="Halal">Halal</option>
+		<option value="none">None</option>
+		<option value="vegan">Vegan</option>
+		<option value="vegetarian">Vegetarian</option>
+		<option value="pescatarian">Pescatarian</option>
+		<option value="halal">Halal</option>
 	</select>
 	<p>Please note that all products in the catalogue are already compliant with a celiac(gluten-free) diet.</p>
 	<br>
