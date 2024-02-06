@@ -1,6 +1,7 @@
 package product;
 
 import jakarta.servlet.RequestDispatcher;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import dao.ProductDAO;
+import dao.Neo4jManager;
+
 
 /**
  * Servlet implementation class DeleteProductServlet
@@ -24,12 +27,16 @@ public class DeleteProductServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String productId = request.getParameter("productId");
 
+		Neo4jManager neo4jManager = new Neo4jManager();
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(productId);
 
         if (product != null) {
-            // Delete the product
+            // Delete the product in mongodb
             productDAO.deleteProduct(productId);
+            
+         // Delete the product in Neo4j
+            neo4jManager.deleteNeo4jProductNode(productId);
 
             // Redirect to the main page
             PrintWriter out = response.getWriter();

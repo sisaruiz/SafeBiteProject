@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import dao.ProductDAO;
+import dao.Neo4jManager;
 
 /**
  * Servlet implementation class UpdateProductServlet
@@ -67,6 +68,10 @@ public class UpdateProductServlet extends HttpServlet {
 
             // Save the updated product
             productDAO.updateProduct(product);
+            
+         // Update the product in Neo4j
+            Neo4jManager neo4jManager = new Neo4jManager();
+            neo4jManager.updateNeo4jProductNode(product.getId(), product.getName());
 
             // Redirect to the product details page
             out.println("Product updated successfully.");
