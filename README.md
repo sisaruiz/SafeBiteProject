@@ -6,8 +6,8 @@ a. Admin
 - ~users catalogue: delete user~
 
 b. User
-- revamp "add friend" functionality (node4j)
-- like product (node4j)
+- revamp "add friend" functionality 
+- like product 
 - ~follows diet~
 - ~is allergic to~
 
