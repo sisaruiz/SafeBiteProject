@@ -11,7 +11,7 @@ b. User
 - follows diet
 - is allergic to
 
-c. upload data onto Neo4j
+c. ~upload data onto Neo4j~
 
 d. implement queries for:
 - product recommendation
