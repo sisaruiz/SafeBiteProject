@@ -19,6 +19,8 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import dao.Neo4jManager;
+
 /**
  * Servlet implementation class DietServlet
  */
@@ -57,16 +59,24 @@ public class DietServlet extends HttpServlet {
 	        allergies = new ArrayList<>();
 	    }
 
-	    //Update related doc
+	    // Update related doc in MongoDB
 	    usersCollection.updateOne(new Document("user_name", username), new Document("$set",
 	        new Document("diet_type", diet)
 	            .append("allergy", new Document("allergens", allergies))));
 
+	    Neo4jManager neo4jManager = new Neo4jManager();
+	    for (String allergen : allergies) {
+	    	System.out.println(allergen);
+    	    neo4jManager.createNeo4jUserAllergyRelationship(username, allergen);
+    	}
+	    neo4jManager.createNeo4jUserDietRelationship(username, diet);
+	    neo4jManager.closeNeo4jConnection();
 	    
-	    //Redirect to success page
+	    // Redirect to success page
 	    response.sendRedirect("success.jsp");
 	    
 	    myClient.close();
 	}
 
 }
+

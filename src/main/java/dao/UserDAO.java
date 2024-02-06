@@ -26,8 +26,7 @@ public class UserDAO {
     public UserDAO() {
         mongoClient = MongoClients.create("mongodb://localhost:27017");
         database = mongoClient.getDatabase("SafeBite");
-        usersCollection = database.getCollection("Users");
-        
+        usersCollection = database.getCollection("Users");       
         neo4jManager = new Neo4jManager();
         
     }
@@ -88,7 +87,6 @@ public class UserDAO {
 
         if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
             for (String allergen : user.getListAllergens()) {
-                neo4jManager.createNeo4jAllergyNode(allergen);
                 neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
             }
         }
@@ -106,23 +104,16 @@ public class UserDAO {
 
         // Update the document in the MongoDB collection
         usersCollection.updateOne(query, update);
-        
-        
-        
-     // Update Neo4j nodes and relationships
-        neo4jManager.createNeo4jUserNode(user.getName());
-        
-        if (user.getDiet() != null) {
-            neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
-        }
+                       
+        neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
+        neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
 
+        neo4jManager.deleteNeo4jUserAllergenRelationships(user.getName());
         if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
             for (String allergen : user.getListAllergens()) {
-                neo4jManager.createNeo4jAllergyNode(allergen);
                 neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
             }
         }
-        
     }
     
     

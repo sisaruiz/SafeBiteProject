@@ -45,6 +45,9 @@
 	<input type="checkbox" id="peanuts" name="allergens" value="peanuts" /><label for="peanuts">Peanuts</label>
 	<input type="checkbox" id="sesame" name="allergens" value="sesame" /><label for="sesame">Sesame</label>
 	<input type="checkbox" id="rye" name="allergens" value="soy" /><label for="soy">Soy</label>
+	<input type="checkbox" id="apple" name="allergens" value="apple" /><label for="apple">Apple</label>
+	<input type="checkbox" id="tomato" name="allergens" value="tomato" /><label for="tomato">Tomato</label>
+	<input type="checkbox" id="peaches" name="allergens" value="peaches" /><label for="peaches">Peaches</label>
 	<br>
 	<input type=submit value="Set up profile">
 </form>
