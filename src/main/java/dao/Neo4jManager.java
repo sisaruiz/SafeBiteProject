@@ -20,10 +20,6 @@ public class Neo4jManager {
         neo4jSession.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
     }
 
-    public void createNeo4jDietNode(String dietType) {
-        neo4jSession.run("CREATE (:Diet {type: $dietType})", parameters("dietType", dietType));
-    }
-
     public void createNeo4jAllergyNode(String allergen) {
         neo4jSession.run("CREATE (:Allergy {name: $allergen})", parameters("allergen", allergen));
     }

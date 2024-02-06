@@ -83,7 +83,6 @@ public class UserDAO {
         neo4jManager.createNeo4jUserNode(user.getName());
         
         if (user.getDiet() != null) {
-            neo4jManager.createNeo4jDietNode(user.getDiet());
             neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
         }
 
@@ -114,7 +113,6 @@ public class UserDAO {
         neo4jManager.createNeo4jUserNode(user.getName());
         
         if (user.getDiet() != null) {
-            neo4jManager.createNeo4jDietNode(user.getDiet());
             neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
         }
 
