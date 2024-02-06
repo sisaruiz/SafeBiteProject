@@ -74,7 +74,7 @@ public class InsertProductServlet extends HttpServlet {
         ProductDAO productDAO = new ProductDAO();
         productDAO.addProduct(newProduct);
         
-        // Add the new product to Neo4j
+     // Add the new product to Neo4j
         Neo4jManager neo4jManager = new Neo4jManager();
         neo4jManager.createNeo4jProductNode(newProduct.getId(), newProduct.getName());
 

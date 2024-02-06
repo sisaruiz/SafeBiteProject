@@ -71,7 +71,8 @@ public class UpdateProductServlet extends HttpServlet {
             
          // Update the product in Neo4j
             Neo4jManager neo4jManager = new Neo4jManager();
-            neo4jManager.updateNeo4jProductNode(product.getId(), product.getName());
+            neo4jManager.updateNeo4jProductNode(productId, productName);
+            
 
             // Redirect to the product details page
             out.println("Product updated successfully.");

@@ -132,7 +132,12 @@ public class ProductDAO {
             productsCollection.insertOne(productDoc);
 
             System.out.println("Product added successfully!");
-        } catch (Exception e) {
+            
+         // Retrieve the generated MongoDB ID and set it in the Product object
+            ObjectId insertedId = productDoc.getObjectId("_id");
+            product.setId(insertedId.toString());
+
+        }catch (Exception e) {
             System.out.println("Error adding product to MongoDB:");
             e.printStackTrace();
         }
