@@ -20,15 +20,15 @@
 %>
 
 <form action="UpdateProfileServlet" method="post">
-    <!-- Add fields for modifying diet and allergens -->
-    <label for="diet">Diet:</label>
-    <select id="diet" name="diet" required>
-        <option value="none">None</option>
-		<option value="vegan">Vegan</option>
-		<option value="vegetarian">Vegetarian</option>
-		<option value="pescatarian">Pescatarian</option>
-		<option value="halal">Halal</option>
-    </select>
+
+	<label for="diet">Diet:</label>
+	<select id="diet" name="diet" required>
+	    <option value="none" <%= (user.getDiet().equals("none")) ? "selected" : "" %>>None</option>
+	    <option value="vegan" <%= (user.getDiet().equals("vegan")) ? "selected" : "" %>>Vegan</option>
+	    <option value="vegetarian" <%= (user.getDiet().equals("vegetarian")) ? "selected" : "" %>>Vegetarian</option>
+	    <option value="pescatarian" <%= (user.getDiet().equals("pescatarian")) ? "selected" : "" %>>Pescatarian</option>
+	    <option value="halal" <%= (user.getDiet().equals("halal")) ? "selected" : "" %>>Halal</option>
+	</select>
 
     <h4>Allergens:</h4>
 	<input type="checkbox" id="celery" name="allergens" value="celery" <%=(user.getAllergens().contains("celery")) ? "checked" : "" %>/><label for="celery">Celery</label>
