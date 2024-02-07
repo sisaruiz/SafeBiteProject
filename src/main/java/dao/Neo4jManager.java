@@ -68,6 +68,16 @@ public class Neo4jManager {
         }
     }
     
+    public void createNeo4jUserProductLikeRelationship(String userName, String productId) {
+        neo4jSession.run("MATCH (u:User {user_name: $userName}), (p:Product {id: $productId}) CREATE (u)-[:LIKES]->(p)",
+                parameters("userName", userName, "productId", productId));
+    }
+
+    public void deleteNeo4jUserProductLikeRelationship(String userName, String productId) {
+        neo4jSession.run("MATCH (u:User {user_name: $userName})-[r:LIKES]->(p:Product {id: $productId}) DELETE r",
+                parameters("userName", userName, "productId", productId));
+    }
+    
 
     public void deleteNeo4jProductNode(String productId) {
         neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
