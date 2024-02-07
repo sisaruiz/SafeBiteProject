@@ -7,7 +7,7 @@ a. Admin
 
 b. User
 - ~revamp "add friend" functionality~
-- like product 
+- ~like product~
 - ~follows diet~
 - ~is allergic to~
 
