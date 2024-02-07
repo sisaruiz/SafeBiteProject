@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
+import org.neo4j.driver.Values;
 
 
 
@@ -115,38 +116,6 @@ public class UserDAO {
             for (String allergen : user.getListAllergens()) {
                 neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
             }
-        }
-    }
-    
-    
-    public void addFriend(String user1Username, String user2Username) {
-    	updateFriendsListInDatabase(user1Username, user2Username);
-        updateFriendsListInDatabase(user2Username, user1Username);
-    }
-
-    
-    private void updateFriendsListInDatabase(String username, String friendUsername) {
-        // Assuming 'user_name' is the unique identifier in your MongoDB collection
-        Document query = new Document("user_name", username);
-
-        // Add friend to the friends list if not already present
-        Document update = new Document("$addToSet", new Document("friends", friendUsername));
-
-        // Update the document in the MongoDB collection
-        usersCollection.updateOne(query, update);
-    }
-    
-    public boolean areFriends(String user1, String user2) {
-        try {
-            // Assuming you have a method to get a user by username
-            User user = getUserByUsername(user1);
-
-            // Check if user2 is in the friends list of user1
-            return user.getFriends() != null && user.getFriends().contains(user2);
-        } catch (Exception e) {
-            // Handle exceptions appropriately
-            e.printStackTrace();
-            return false;
         }
     }
 

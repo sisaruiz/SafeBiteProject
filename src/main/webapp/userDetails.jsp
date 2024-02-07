@@ -3,6 +3,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="dao.UserDAO" %>
+<%@ page import="dao.Neo4jManager" %>
 <%@ page import="model.User" %>
 <%@ page import="dao.ReviewDAO" %>
 <%@ page import="model.Review" %>
@@ -31,16 +32,19 @@
     <p>Allergens:<%= user.getAllergens() %></p>
     <br>
     
-    <%
+    <%	Neo4jManager neo4j = new Neo4jManager();
 	    String visitorUsername = (String) request.getSession().getAttribute("uname");
-	    boolean areFriends = userDAO.areFriends(visitorUsername, user.getName());
+	    boolean follows = neo4j.checkNeo4jFollowRelationship(visitorUsername, user.getName());
+	    neo4j.closeNeo4jConnection();
 	%>
-	<form action="FriendServlet" method="post">
-	    <input type="hidden" name="userToAdd" value="<%= user.getName() %>">
-    <% if (areFriends) { %>
-        <input type="button" value="Already friends" disabled>
+	<form action="FollowServlet" method="post">
+	    <input type="hidden" name="userToFollow" value="<%= user.getName() %>">
+    <% if (follows) { %>
+        <input type="submit" value="Unfollow">
+        <input type="hidden" name="type" value="unfollow">
     <% } else { %>
-        <input type="submit" value="Be friend">
+        <input type="submit" value="Follow">
+        <input type="hidden" name="type" value="follow">
     <% } %>
 	</form>
     <br>

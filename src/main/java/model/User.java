@@ -58,6 +58,7 @@ public class User extends Account {
         return this.country;
     }
 
+    
     public String getAllergens() {
     	
     	if (this.allergens == null) {
@@ -70,6 +71,7 @@ public class User extends Account {
         
         return result;
     }
+    
     
     public List<String> getListAllergens() {
     	return this.allergens;
