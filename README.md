@@ -6,7 +6,7 @@ a. Admin
 - ~users catalogue: delete user~
 
 b. User
-- revamp "add friend" functionality 
+- ~revamp "add friend" functionality~
 - like product 
 - ~follows diet~
 - ~is allergic to~
