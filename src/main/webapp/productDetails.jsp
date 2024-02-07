@@ -3,6 +3,7 @@
 <%@ page import="model.Product" %>
 <%@ page import="model.Review" %>
 <%@ page import="java.util.List" %>
+<%@ page import="dao.Neo4jManager" %>
 
 <!DOCTYPE html>
 <html>
@@ -16,10 +17,33 @@
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(productId);
 
+        
+        Neo4jManager neo4j = new Neo4jManager();
+        String userName = (String) session.getAttribute("uname"); // Correct session attribute usage
+        boolean likesProduct = neo4j.checkNeo4jUserProductLikeRelationship(userName, productId);
+        
+        
         if (product != null) {
+        	
     %>
             <img src="<%= product.getImgURL() %>">
             <h2><%= product.getName() %></h2>
+            
+            <!-- Like button -->
+            <form action="LikeServlet" method="post">
+                <input type="hidden" name="productId" value="<%= productId %>">
+                <input type="hidden" name="userName" value="<%= userName %>">
+                <% if (likesProduct) { %>
+                    <input type="submit" value="Unlike">
+                    <input type="hidden" name="type" value="unlike">
+                <% } else { %>
+                    <input type="submit" value="Like">
+                    <input type="hidden" name="type" value="like">
+                <% }
+                %>
+                
+            </form>
+            
             <!-- Quantity -->
 			<p>Quantity: <%= product.getQuantity() != null ? product.getQuantity() : "not available" %></p>
 			
