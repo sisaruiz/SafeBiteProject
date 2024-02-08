@@ -194,6 +194,51 @@ public class Neo4jManager {
         neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
     }
     
+    public List<String> getUserFollowers(String userName) {
+        List<String> followers = new ArrayList<>();
+
+        try {
+            Result result = neo4jSession.run(
+                    "MATCH (follower:User)-[:FOLLOWS]->(:User {user_name: $userName}) RETURN follower.user_name AS followerName",
+                    Values.parameters("userName", userName)
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                followers.add(record.get("followerName").asString());
+            }
+
+            return followers;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting followers: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public List<String> getUserFollowing(String userName) {
+        List<String> following = new ArrayList<>();
+
+        try {
+            Result result = neo4jSession.run(
+                    "MATCH (:User {user_name: $userName})-[:FOLLOWS]->(followee:User) RETURN followee.user_name AS followeeName",
+                    Values.parameters("userName", userName)
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                following.add(record.get("followeeName").asString());
+            }
+
+            return following;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting following: " + e.getMessage());
+            return null;
+        }
+    }
+
+    
     public void closeNeo4jConnection() {
         neo4jSession.close();
         neo4jDriver.close();

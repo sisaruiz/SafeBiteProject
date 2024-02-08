@@ -16,13 +16,12 @@
 <title>Your Profile</title>
 </head>
 <body>
-<%
-    String username = (String) session.getAttribute("uname");
-    UserDAO userDAO = new UserDAO();
-    User user = userDAO.getUserByUsername(username);
-    ReviewDAO reviewDAO = new ReviewDAO();
-    Object reviewsObject = reviewDAO.getLastThreeReviewsWithDates(username);
-
+	<%
+	    String username = (String) session.getAttribute("uname");
+	    UserDAO userDAO = new UserDAO();
+	    User user = userDAO.getUserByUsername(username);
+	    ReviewDAO reviewDAO = new ReviewDAO();
+	    Object reviewsObject = reviewDAO.getLastThreeReviewsWithDates(username);
     %>
     <h1>Your profile</h1>
     <img class="user-img" src=<%= user.getPic() %>>
@@ -31,9 +30,10 @@
     <p>Country:<%= user.getCountry() %></p>
     <p>Gender:<%= user.getGender() %></p>
     <p>Birthday:<%= user.getDOB() %></p>
-    <br>
     <p>Diet:<%= user.getDiet() %></p>
     <p>Allergens:<%= user.getAllergens() %></p>
+    <br>
+    	<a href="connections.jsp">View Connections</a>
     <br>
     <a href="editProfile.jsp">Edit Profile</a>
     <br>
