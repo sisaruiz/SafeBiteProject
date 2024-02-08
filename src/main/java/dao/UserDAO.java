@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
-import org.neo4j.driver.Values;
 
 
 
@@ -59,7 +58,11 @@ public class UserDAO {
             try {
                 // Query the 'Products' collection for matching documents
                 Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
-                Document query = new Document("user_name", pattern);
+                
+                // Add a condition to exclude users with 'admin' set to true
+                Document query = new Document("user_name", pattern)
+                                        .append("admin", false);
+
                 System.out.println("Constructed MongoDB Query: " + query.toJson());
 
                 for (Document userDoc : usersCollection.find(query)) {
@@ -78,6 +81,7 @@ public class UserDAO {
 
         return users;
     }
+
     
     
     public void createUserInNeo4j(User user) {

@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Browse products</title>
+<title>Browse Users</title>
 </head>
 <body>
 <%
