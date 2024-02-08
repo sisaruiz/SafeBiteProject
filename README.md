@@ -12,6 +12,7 @@ c. User
 - ~like product~
 - ~follows diet~
 - ~is allergic to~
+- ~is_compatible_with~ 
 - ~update user results so that if i look up myself i will open yourProfile page and NOT userDetails~
 
 d. implement queries for:
