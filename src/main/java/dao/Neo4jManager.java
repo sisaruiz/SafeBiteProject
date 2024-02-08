@@ -11,6 +11,7 @@ import org.neo4j.driver.Record;
 
 import static org.neo4j.driver.Values.parameters;
 
+import model.Product;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -234,6 +235,34 @@ public class Neo4jManager {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error getting following: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    public List<Product> getLikedProductsForUser(String userName) {
+        List<Product> likedProducts = new ArrayList<>();
+
+        try {
+            Result result = neo4jSession.run(
+                "MATCH (:User {user_name: $userName})-[:LIKES]->(product:Product) RETURN product.id AS productId, product.name AS productName",
+                Values.parameters("userName", userName)
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                String productId = record.get("productId").asString();
+                String productName = record.get("productName").asString();
+                
+                // Create a simplified Product instance with 'id' and 'name'
+                Product product = new Product(productId, productName, null);
+                likedProducts.add(product);
+            }
+
+            return likedProducts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting liked products for user: " + e.getMessage());
             return null;
         }
     }
