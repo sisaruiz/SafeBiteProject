@@ -16,9 +16,13 @@
 	}
 	
 	String userName = (String) session.getAttribute("uname");
+	
     List<String> potentialFriends = neo4jManager.findPotentialFriends(userName);
-
     request.setAttribute("potentialFriends", potentialFriends);
+    
+ // Retrieve and set recommended products
+    List<String> recommendedProducts = neo4jManager.findRecommendedProducts(userName);
+    request.setAttribute("recommendedProducts", recommendedProducts);
 %>
 <h2>
 Welcome, <%=session.getAttribute("uname")%>
@@ -33,8 +37,16 @@ Welcome, <%=session.getAttribute("uname")%>
 <a href="browseProducts.jsp">Search products</a>
 <a href="browseUsers.jsp">Search users</a>
 <section>
-    <h3>Products you may want to try ...</h3>
+    <h3>Explore recommended products ...</h3>
+    <% if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
+           for (String product : recommendedProducts) { %>
+               <p><a href="productDetails.jsp?product=<%= product %>"><%= product %></a></p>
+    <%  }
+       } else { %>
+           <p>No recommended products found. Try updating your preferences.</p>
+    <% } %>
 </section>
+
 <section>
     <h3>Explore potential connections ...</h3>
     <% if (potentialFriends != null) {
