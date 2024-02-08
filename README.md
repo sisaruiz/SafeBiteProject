@@ -5,13 +5,13 @@ a. Admin
 - ~products catalogue: add/remove/update product, remove review~.
 - ~users catalogue: delete user~
 
-b. User
-- revamp "add friend" functionality 
-- like product 
+b. ~upload data onto Neo4j~
+
+c. User
+- ~revamp "add friend" functionality~
+- ~like product~
 - ~follows diet~
 - ~is allergic to~
-
-c. ~upload data onto Neo4j~
 
 d. implement queries for:
 - product recommendation

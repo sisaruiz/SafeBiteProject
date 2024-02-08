@@ -1,7 +1,3 @@
-/dao/
-/signup/
-/product/
-/model/
-/friend/
 /follow/
-/FollowServlet.class
+/product/
+/dao/

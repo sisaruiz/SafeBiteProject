@@ -92,24 +92,31 @@ public class Neo4jManager {
     }
     
     public void createNeo4jUserProductLikeRelationship(String userName, String productId) {
-        neo4jSession.run("MATCH (u:User {user_name: $userName}), (p:Product {id: $productId}) CREATE (u)-[:LIKES]->(p)",
-                parameters("userName", userName, "productId", productId));
+        try (Session independentSession = neo4jDriver.session()) {
+            try (Transaction transaction = independentSession.beginTransaction()) {
+                transaction.run("MATCH (u:User {user_name: $userName}), (p:Product {id: $productId}) CREATE (u)-[:LIKES]->(p)",
+                        parameters("userName", userName, "productId", productId));
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating Neo4j User-Product Like Relationship: " + e.getMessage());
+        }
     }
 
     public void deleteNeo4jUserProductLikeRelationship(String userName, String productId) {
-        neo4jSession.run("MATCH (u:User {user_name: $userName})-[r:LIKES]->(p:Product {id: $productId}) DELETE r",
-                parameters("userName", userName, "productId", productId));
+        try (Session independentSession = neo4jDriver.session()) {
+            try (Transaction transaction = independentSession.beginTransaction()) {
+                transaction.run("MATCH (u:User {user_name: $userName})-[r:LIKES]->(p:Product {id: $productId}) DELETE r",
+                        parameters("userName", userName, "productId", productId));
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error deleting Neo4j User-Product Like Relationship: " + e.getMessage());
+        }
     }
-    
 
-    public void deleteNeo4jProductNode(String productId) {
-        neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
-    }
-    
-    public void closeNeo4jConnection() {
-        neo4jSession.close();
-        neo4jDriver.close();
-    }
     
     public boolean checkNeo4jFollowRelationship(String userFrom, String userTo) {
     	try {
@@ -152,4 +159,44 @@ public class Neo4jManager {
             return null;
         }
     }
+    public boolean checkNeo4jUserProductLikeRelationship(String userName, String productId) {
+        try {
+            String cypherQuery = "MATCH (:User {user_name: $userName})-[:LIKES]->(:Product {id: $productId}) " +
+                    "RETURN EXISTS((:User {user_name: $userName})-[:LIKES]->(:Product {id: $productId})) AS relationshipExists";
+
+            Result result = neo4jSession.run(cypherQuery, parameters("userName", userName, "productId", productId));
+
+            // Print the actual Cypher query and parameters
+            System.out.println("Cypher Query: " + cypherQuery);
+            System.out.println("Parameters: " + parameters("userName", userName, "productId", productId));
+
+            if (result.hasNext()) {
+                Record record = result.single();
+
+                // Print the result of the Cypher query
+                System.out.println("Relationship Exists: " + record.get("relationshipExists").asBoolean());
+
+                return record.get("relationshipExists").asBoolean();
+            } else {
+                // No record found, relationship does not exist
+                System.out.println("Relationship Does Not Exist");
+                return false;
+            }
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+
+    public void deleteNeo4jProductNode(String productId) {
+        neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
+    }
+    
+    public void closeNeo4jConnection() {
+        neo4jSession.close();
+        neo4jDriver.close();
+    }
+    
 }
