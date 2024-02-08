@@ -238,6 +238,35 @@ public class Neo4jManager {
             return null;
         }
     }
+    
+    
+    public List<String> findRecommendedProducts(String userName) {
+        List<String> recommendedProducts = new ArrayList<>();
+
+        try {
+            Result result = neo4jSession.run(
+                "MATCH (user:User {user_name: $userName})-[:HAS_DIET]->(diet:Diet) " +
+                "OPTIONAL MATCH (user)-[:HAS_ALLERGEN]->(allergen:Allergen) " +
+                "MATCH (product:Product)-[:IS_COMPATIBLE_WITH]->(diet) " +
+                "WHERE NOT (allergen IS NOT NULL AND (product)-[:CONTAINS]->(allergen)) " +
+                "AND NOT (user)-[:LIKES]->(product) " +
+                "RETURN DISTINCT product.name AS productName " +
+                "LIMIT 10",
+                Values.parameters("userName", userName)
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                recommendedProducts.add(record.get("productName").asString());
+            }
+
+            return recommendedProducts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error finding recommended products: " + e.getMessage());
+            return null;
+        }
+    }
 
 
     public List<Product> getLikedProductsForUser(String userName) {
