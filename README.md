@@ -22,7 +22,7 @@ d. implement queries for:
   
 e. implement queries on mongoDB
 
-f. display results
+f. display results of those queries
 
 g. make it beautiful
 
