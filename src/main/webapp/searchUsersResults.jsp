@@ -16,6 +16,7 @@
         List<User> allUsers = userDAO.searchUsers(request.getParameter("searchTerm"));
         int numberOfResults = allUsers.size();
         Boolean isAdmin = (Boolean)session.getAttribute("admin");
+        String curUser = (String) session.getAttribute("uname");
     %>
 
     <p>Number of results: <%= numberOfResults %></p>
@@ -23,11 +24,15 @@
         if (numberOfResults > 0) {
             for (int i = 0; i < numberOfResults; i++) {
                 User user = allUsers.get(i);
+                // Check if the current user's name matches the user in the loop
+                boolean isCurrentUser = curUser.equals(user.getName());
     %>
-                <p>	<% if (isAdmin==false) {%>
-                    <a href="userDetails.jsp?user=<%= user.getName() %>">
-                    <% }%><%= user.getName() %>
-                    <% if (isAdmin==false) {%></a><% }%>
+                <p>
+                    <% if (isCurrentUser) { %>
+                        <a href="yourProfile.jsp"><%= user.getName() %></a>
+                    <% } else if (!isAdmin) { %>
+                        <a href="userDetails.jsp?user=<%= user.getName() %>"><%= user.getName() %></a>
+                    <% } %>
                     <!-- Display delete button only if admin -->
                     <% if (Objects.nonNull(isAdmin) && isAdmin) { %>
                         <form method="post" action="DeleteUserServlet">
