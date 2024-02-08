@@ -5,9 +5,14 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
+import org.neo4j.driver.Values;
 import org.neo4j.driver.Result;
+import org.neo4j.driver.Record;
 
 import static org.neo4j.driver.Values.parameters;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Neo4jManager {
     private Driver neo4jDriver;
@@ -119,6 +124,32 @@ public class Neo4jManager {
             // Handle exceptions appropriately
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    public List<String> findPotentialFriends(String userName) {
+        List<String> potentialFriends = new ArrayList<>();
+
+        try {
+            Result result = neo4jSession.run(
+                "MATCH (user:User {user_name: $userName})-[:FOLLOWS]->(friend)-[:FOLLOWS]->(potentialFriend) " +
+                "WHERE NOT (user)-[:FOLLOWS]->(potentialFriend) " +
+                "RETURN DISTINCT potentialFriend.user_name AS potentialFriendName",
+                Values.parameters("userName", userName)
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                String potentialFriendName = record.get("potentialFriendName").asString();
+                potentialFriends.add(potentialFriendName);
+            }
+
+            // Check if the list is empty and return null in such cases
+            return potentialFriends.isEmpty() ? null : potentialFriends;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error finding potential friends: " + e.getMessage());
+            return null;
         }
     }
 }
