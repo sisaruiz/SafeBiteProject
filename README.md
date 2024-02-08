@@ -15,7 +15,7 @@ c. User
 
 d. implement queries for:
 - product recommendation
-- user recommendation
+- ~user recommendation~
   
 e. implement queries on mongoDB
 
