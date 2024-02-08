@@ -17,7 +17,7 @@ c. User
 - display like products in yourProfile page
 
 d. implement queries for:
-- product recommendation
+- ~product recommendation~
 - ~user recommendation~
   
 e. implement queries on mongoDB
