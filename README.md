@@ -22,7 +22,6 @@ d. implement queries for:
   
 e. implement queries on mongoDB:
 - What are the top 5 products with the highest average ratings in each category(products,users:age,country)?
-- What are the emerging ingredient trends in gluten-free products?
 - Performance analysis of a specific brand in different countries, considering factors like user reviews and likes.
 - Which countries have the highest availability of products with specific certifications (e.g., organic, gluten-free)?
 - Analyze the distribution of ratings given by users over time.
