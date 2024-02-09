@@ -1,14 +1,15 @@
 package dao;
 
 import org.neo4j.driver.AuthTokens;
+
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
+import org.neo4j.driver.Value;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Record;
-
 import static org.neo4j.driver.Values.parameters;
 
 import java.util.ArrayList;
@@ -266,6 +267,29 @@ public class Neo4jManager {
             return null;
         }
     }
+    
+    
+ // Function to get the most popular users with followers count
+    public List<String[]> getMostPopularUsersWithFollowersCount() {
+        List<String[]> popularUsersWithFollowers = new ArrayList<>();
+
+        try (Session session = neo4jDriver.session()) {
+            String cypherQuery = "MATCH (u:User)-[:FOLLOWS]->(follower:User) " +
+                                 "RETURN u.user_name AS username, COUNT(follower) AS followers " +
+                                 "ORDER BY followers DESC LIMIT 5";
+
+            List<Record> result = session.run(cypherQuery).list();
+
+            for (Record record : result) {
+                String username = record.get("username").asString();
+                long followersCount = record.get("followers").asLong();
+                popularUsersWithFollowers.add(new String[]{username, String.valueOf(followersCount)});
+            }
+        }
+
+        return popularUsersWithFollowers;
+    }
+
 
     
     public void closeNeo4jConnection() {

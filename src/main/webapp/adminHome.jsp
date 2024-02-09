@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<%@ page import="org.neo4j.driver.AuthTokens" %>
+<%@ page import="org.neo4j.driver.Driver" %>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -58,5 +63,13 @@ Welcome, <%=session.getAttribute("uname")%>
 </pre>
 </form>
 </section>
+
+
+<br>
+<!-- Add a button to navigate to systemAnalysis.jsp -->
+<form action="systemAnalysis.jsp">
+    <input type="submit" value="System Analysis">
+</form>
+
 </body>
 </html>
