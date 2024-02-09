@@ -33,9 +33,11 @@
     <p>Diet:<%= user.getDiet() %></p>
     <p>Allergens:<%= user.getAllergens() %></p>
     <br>
-    	<a href="connections.jsp">View Connections</a>
+    <a href="likedProducts.jsp">Your liked products</a>
     <br>
-    <a href="editProfile.jsp">Edit Profile</a>
+    <a href="connections.jsp">Your connections</a>
+    <br>
+    <a href="editProfile.jsp">Edit profile</a>
     <br>
     <%
     if (reviewsObject != null && !((Map<?, ?>) reviewsObject).isEmpty()) {
