@@ -341,6 +341,26 @@ public class Neo4jManager {
 
         return mostFollowedDietsWithUserCount;
     }
+    
+    public List<String[]> getAllergensWithUserCount() {
+        List<String[]> allergensWithUserCount = new ArrayList<>();
+
+        try (Session session = neo4jDriver.session()) {
+            String cypherQuery = "MATCH (u:User)-[:HAS_ALLERGEN]->(allergen:Allergen) " +
+                                 "RETURN allergen.name AS allergenName, COUNT(u) AS userCount " +
+                                 "ORDER BY userCount DESC LIMIT 10";
+
+            List<Record> result = session.run(cypherQuery).list();
+
+            for (Record record : result) {
+                String allergenName = record.get("allergenName").asString();
+                long userCount = record.get("userCount").asLong();
+                allergensWithUserCount.add(new String[]{allergenName, String.valueOf(userCount)});
+            }
+        }
+
+        return allergensWithUserCount;
+    }
 
     
     public void closeNeo4jConnection() {

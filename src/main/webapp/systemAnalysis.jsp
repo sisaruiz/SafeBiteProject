@@ -25,6 +25,10 @@
             background-color: green; /* Change the color as needed */
             color: white;
         }
+        .histogram-bar3 {
+            background-color: orange; /* Change the color as needed */
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +44,12 @@
 private int calculateHistogramWidthForDiets(long userCount) {
     // Adjust the multiplier or any other logic based on your requirements
     return (int) (userCount * 7); // Adjust the multiplier as needed
+}
+
+//Function to calculate the width for the third section
+private int calculateHistogramWidthForAllergens(long userCount) {
+    // Adjust the multiplier or any other logic based on your requirements
+    return (int) (userCount * 3); // Adjust the multiplier as needed
 }
 
 
@@ -83,7 +93,6 @@ private int calculateHistogramWidthForDiets(long userCount) {
         <!-- Add your horizontal bar chart display logic here -->
         <%
             List<String[]> mostFollowedDietsWithUserCount = neo4jManager.getMostFollowedDietsWithUserCount();
-            neo4jManager.closeNeo4jConnection();
 
             // Display the most followed diets as a horizontal bar chart
             for (String[] dietWithUserCount : mostFollowedDietsWithUserCount) {
@@ -101,5 +110,39 @@ private int calculateHistogramWidthForDiets(long userCount) {
         %>
     </div>
 </section>
+
+<br>
+<section>
+    <h3>Most Popular Allergens</h3>
+    <div class="histogram-container">
+        <!-- Add your histogram display logic here -->
+        <%
+            // Get allergens with the number of users allergic to each allergen
+            List<String[]> allergensWithUserCount = neo4jManager.getAllergensWithUserCount();
+
+            // Display allergens and users count as a histogram
+            for (String[] allergenWithUserCount : allergensWithUserCount) {
+                String allergenName = allergenWithUserCount[0];
+                long userCount = Long.parseLong(allergenWithUserCount[1]);
+                int barWidth = calculateHistogramWidthForAllergens(userCount);
+        %>
+                <div class="histogram-bar histogram-bar3" style="width: <%= barWidth %>px;">
+                    <span><%= allergenName %></span>
+                    <div class="bar-fill" style="width: <%= (userCount * 5) %>px;"></div>
+                    <span><%= userCount %> Users</span>
+                </div>
+        <%
+            }
+        %>
+    </div>
+</section>
+
+
+<br>
+<!-- Add a button to navigate to systemAnalysis.jsp -->
+<form action="adminHome.jsp">
+    <input type="submit" value="Return Home">
+</form>
+<br>
 </body>
 </html>
