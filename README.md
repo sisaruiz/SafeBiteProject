@@ -31,7 +31,7 @@ e. implement queries on mongoDB:
 f. implement queries on neo4j:
 - ~Which are the most popular users (highest number of users following him)?~
 - ~What are the most followed diets among users, and how many users follow each diet?~
-- Which allergens are most prevalent among users, and how many users are allergic to each allergen?
+- ~Which allergens are most prevalent among users, and how many users are allergic to each allergen?~
 
 g. display results of those queries
 
