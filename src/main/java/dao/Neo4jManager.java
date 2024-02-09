@@ -6,7 +6,6 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
-import org.neo4j.driver.Value;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Record;
@@ -14,7 +13,9 @@ import static org.neo4j.driver.Values.parameters;
 
 import model.Product;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Neo4jManager {
     private Driver neo4jDriver;
@@ -269,29 +270,6 @@ public class Neo4jManager {
         }
     }
     
-    
- // Function to get the most popular users with followers count
-    public List<String[]> getMostPopularUsersWithFollowersCount() {
-        List<String[]> popularUsersWithFollowers = new ArrayList<>();
-
-        try (Session session = neo4jDriver.session()) {
-            String cypherQuery = "MATCH (u:User)-[:FOLLOWS]->(follower:User) " +
-                                 "RETURN u.user_name AS username, COUNT(follower) AS followers " +
-                                 "ORDER BY followers DESC LIMIT 5";
-
-            List<Record> result = session.run(cypherQuery).list();
-
-            for (Record record : result) {
-                String username = record.get("username").asString();
-                long followersCount = record.get("followers").asLong();
-                popularUsersWithFollowers.add(new String[]{username, String.valueOf(followersCount)});
-            }
-        }
-
-        return popularUsersWithFollowers;
-    }
-
-
 
     public List<Product> getLikedProductsForUser(String userName) {
         List<Product> likedProducts = new ArrayList<>();
@@ -318,6 +296,50 @@ public class Neo4jManager {
             System.out.println("Error getting liked products for user: " + e.getMessage());
             return null;
         }
+    }
+
+    
+    // Function to get the most popular users with followers count
+    public List<String[]> getMostPopularUsersWithFollowersCount() {
+        List<String[]> popularUsersWithFollowers = new ArrayList<>();
+
+        try (Session session = neo4jDriver.session()) {
+            String cypherQuery = "MATCH (u:User)-[:FOLLOWS]->(follower:User) " +
+                                 "RETURN u.user_name AS username, COUNT(follower) AS followers " +
+                                 "ORDER BY followers DESC LIMIT 5";
+
+            List<Record> result = session.run(cypherQuery).list();
+
+            for (Record record : result) {
+                String username = record.get("username").asString();
+                long followersCount = record.get("followers").asLong();
+                popularUsersWithFollowers.add(new String[]{username, String.valueOf(followersCount)});
+            }
+        }
+
+        return popularUsersWithFollowers;
+    }
+    
+    
+ // Function to get the most followed diets and the count of users for each diet
+    public List<String[]> getMostFollowedDietsWithUserCount() {
+        List<String[]> mostFollowedDietsWithUserCount = new ArrayList<>();
+
+        try (Session session = neo4jDriver.session()) {
+            String cypherQuery = "MATCH (u:User)-[:HAS_DIET]->(diet:Diet) " +
+                                 "RETURN diet.type AS dietType, COUNT(u) AS userCount " +
+                                 "ORDER BY userCount DESC";
+
+            List<Record> result = session.run(cypherQuery).list();
+
+            for (Record record : result) {
+                String dietType = record.get("dietType").asString();
+                long userCount = record.get("userCount").asLong();
+                mostFollowedDietsWithUserCount.add(new String[]{dietType, String.valueOf(userCount)});
+            }
+        }
+
+        return mostFollowedDietsWithUserCount;
     }
 
     
