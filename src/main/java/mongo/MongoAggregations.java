@@ -55,32 +55,31 @@ public class MongoAggregations {
     }
     
     public List<Document> getProductCountByBrandAndCountry() {
-    	List<Bson> pipeline = Arrays.asList(
-    		    // Match documents with both brands and countries_en fields
-    		    match(and(exists("brands"), exists("countries_en"))),
-
-    		    // Group by brand owner and country and count the number of products
-    		    group(and(eq("brands", "$brands"), eq("countries_en", "$countries_en")),
-    		            sum("productCount", 1)),
-
-    		    // Project the results to rename the _id field and include the productCount
-    		    project(fields(
-    		        computed("brandOwner", "$_id.brands"),
-    		        computed("country", "$_id.countries_en"),
-    		        include("productCount"),
-    		        excludeId())),
-
-    		    // Sort the results if needed
-    		    sort(ascending("brandOwner", "country"))
-    		);
-
-        MongoCursor<Document> cursor = collection.aggregate(pipeline).iterator();
-        List<Document> results = new ArrayList<>();
-        while (cursor.hasNext()) {
-            results.add(cursor.next());
-        }
+        Bson matchStage = match(and(exists("brands"), exists("countries_en")));
+        
+        Bson groupStage = group(fields(eq("brands", "$brands"), eq("countries_en", "$countries_en")), sum("productCount", 1));
+        
+        Bson projectStage = project(fields(
+            computed("brandOwner", "$_id.brands"),
+            computed("country", "$_id.countries_en"),
+            include("productCount"),
+            excludeId()
+        ));
+        
+        Bson sortStage = sort(descending("productCount"));
+        
+        Bson limitStage = limit(20);
+        
+        List<Bson> pipeline = Arrays.asList(matchStage, groupStage, projectStage, sortStage, limitStage);
+        
+        List<Document> results = collection.aggregate(pipeline).into(new ArrayList<>());
+        
+        // Print the results for debugging
+        System.out.println("Aggregation Results: " + results);
+        
         return results;
     }
+
     
     
     public static List<Document> getMostReviewedProducts(MongoCollection<Document> reviewsCollection, int limit) {

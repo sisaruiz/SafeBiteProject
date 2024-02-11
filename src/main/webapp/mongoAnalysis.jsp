@@ -62,21 +62,6 @@
     <% } %>
 </table>
 
-
-<h1>Product Category Counts</h1>
-<table border="1">
-    <tr>
-        <th>Category</th>
-        <th>Count</th>
-    </tr>
-    <% for (Document document : productCategoryCounts) { %>
-        <tr>
-            <td><%= formatCategory(document.get("_id")) %></td>
-            <td><%= document.get("count") %></td>
-        </tr>
-    <% } %>
-</table>
-
 <h1>Product Count by Brand and Country</h1>
 <table border="1">
     <tr>
@@ -92,6 +77,21 @@
         </tr>
     <% } %>
 </table>
+
+<h1>Product Category Counts</h1>
+<table border="1">
+    <tr>
+        <th>Category</th>
+        <th>Count</th>
+    </tr>
+    <% for (Document document : productCategoryCounts) { %>
+        <tr>
+            <td><%= formatCategory(document.get("_id")) %></td>
+            <td><%= document.get("count") %></td>
+        </tr>
+    <% } %>
+</table>
+
 
 <%
     // Close the MongoDB connections after using the results
