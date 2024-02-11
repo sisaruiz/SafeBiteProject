@@ -83,14 +83,14 @@ public class MongoAggregations {
     }
     
     
-    public static Document getMostReviewedProduct(MongoCollection<Document> reviewsCollection) {
+    public static List<Document> getMostReviewedProducts(MongoCollection<Document> reviewsCollection, int limit) {
         // Aggregation pipeline
         List<Document> pipeline = Arrays.asList(
             new Document("$group", new Document("_id",
                 new Document("ProductID", "$Product ID").append("ProductName", "$Product Name"))
                 .append("reviewCount", new Document("$sum", 1))),
             new Document("$sort", new Document("reviewCount", -1)),
-            new Document("$limit", 1),
+            new Document("$limit", limit),
             new Document("$project", new Document("_id", 0)
                 .append("ProductID", "$_id.ProductID")
                 .append("ProductName", "$_id.ProductName")
@@ -100,8 +100,13 @@ public class MongoAggregations {
         // Execute the aggregation pipeline
         AggregateIterable<Document> aggregationResult = reviewsCollection.aggregate(pipeline);
 
-        // Get the result as a Document
-        return aggregationResult.first();
+        // Convert the result to a list of documents
+        List<Document> mostReviewedProducts = new ArrayList<>();
+        for (Document document : aggregationResult) {
+            mostReviewedProducts.add(document);
+        }
+
+        return mostReviewedProducts;
     }
 
     

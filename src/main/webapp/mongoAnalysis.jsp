@@ -36,7 +36,7 @@
 
     AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
     List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
-    Document mostReviewedProduct = reviewsAggregations.getMostReviewedProduct(reviewsAggregations.getCollection());
+    List<Document> mostReviewedProducts = reviewsAggregations.getMostReviewedProducts(reviewsAggregations.getCollection(), 10);
 %>
 
 <h1>Most Reviewed Product</h1>
@@ -46,19 +46,22 @@
         <th>Product Name</th>
         <th>Review Count</th>
     </tr>
-    <tr>
-        <td>
-            <% 
-                Object productIdObj = mostReviewedProduct.get("_id");
-                if (productIdObj instanceof ObjectId) {
-                    out.print(((ObjectId) productIdObj).toString());
-                }
-            %>
-        </td>
-        <td><%= mostReviewedProduct.getString("ProductName") %></td>
-        <td><%= mostReviewedProduct.getInteger("reviewCount") %></td>
-    </tr>
+    <% for (Document product : mostReviewedProducts) { %>
+        <tr>
+            <td>
+                <% 
+                    Object productIdObj = product.get("ProductID");
+                    if (productIdObj instanceof ObjectId) {
+                        out.print(((ObjectId) productIdObj).toString());
+                    }
+                %>
+            </td>
+            <td><%= product.getString("ProductName") %></td>
+            <td><%= product.getInteger("reviewCount") %></td>
+        </tr>
+    <% } %>
 </table>
+
 
 <h1>Product Category Counts</h1>
 <table border="1">
