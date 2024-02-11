@@ -36,12 +36,20 @@ public class MongoAggregations {
         this.collection = database.getCollection(collectionName);
     }
 
+    //Retrieves the aggregate result for the count of products in each category.
     public AggregateIterable<Document> getProductCategoryCounts() {
+        // Perform aggregation using the MongoDB Java driver
         return collection.aggregate(Arrays.asList(
+                // Group products by the 'main_category' field and calculate the count of each group
                 group("$main_category", sum("count", 1)),
+
                 sort(descending("count")),
                 limit(10),
+                
+                // Group the limited results by the '_id' (main_category) field and recalculate the count
                 group("$_id", sum("count", "$count")),
+
+                // Sort the final results in descending order based on the count
                 sort(descending("count"))
         ));
     }

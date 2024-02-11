@@ -5,6 +5,20 @@
 <%@ page import="mongo.MongoAggregations" %>
 
 <html>
+
+<%!  // Declaration of the method outside the scriptlet block
+    String formatCategory(Object category) {
+        if (category == null) {
+            return "unspecified";
+        } else if (category instanceof String) {
+            // Remove the "en:" prefix
+            return ((String) category).replace("en:", "");
+        } else {
+            return category.toString();
+        }
+    }
+%>
+
 <head>
     <title>MongoDB Aggregation Results</title>
 </head>
@@ -29,7 +43,7 @@
     </tr>
     <% for (Document document : result) { %>
         <tr>
-            <td><%= document.get("_id") %></td>
+            <td><%= formatCategory(document.get("_id")) %></td>
             <td><%= document.get("count") %></td>
         </tr>
     <% } %>
@@ -55,6 +69,7 @@
 <%
     // Close the MongoDB connection after using the results
     mongoAggregations.closeConnection();
+
 %>
 </body>
 </html>
