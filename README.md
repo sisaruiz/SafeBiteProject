@@ -21,12 +21,12 @@ d. implement queries for:
 - ~user recommendation~
   
 e. implement queries on mongoDB:
-- What are the top 5 products with the highest average ratings in each category(products,users:age,country)?
-- Performance analysis of a specific brand in different countries, considering factors like user reviews and likes.
-- Which countries have the highest availability of products with specific certifications (e.g., organic, gluten-free)?
-- Analyze the distribution of ratings given by users over time.
-- How do the sentiments expressed in reviews evolve over time?
-- What are the trending topics in reviews based on keyword frequency?
+- Count the number of products created by each brand owner in a specific country (products collection)
+- Count the number of products in each category and sort them (products collection)
+- List the top users who have reviewed the most products and their average rating (Reviews collection)
+- Get the most reviewed product along with the count of reviews (Reviews collection)
+- Analyze the distribution of ratings given by users over time.(Reviews Collection)
+- Identify users with similar diet types and count the number of unique countries they are from (users collection)
 
 f. implement queries on neo4j:
 - ~Which are the most popular users (highest number of users following him)?~
