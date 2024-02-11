@@ -108,6 +108,7 @@ public class MongoAggregations {
         return mostReviewedProducts;
     }
     
+
     public List<Document> getTopReviewersAndAverageRating(int limit) {
         // Aggregation pipeline
         List<Document> pipeline = Arrays.asList(
@@ -132,8 +133,64 @@ public class MongoAggregations {
         }
 
         return topReviewersAndAverageRating;
-    }
+}
+   
 
+    public AggregateIterable<Document> analizeCountriesLeadingDietsPercentage() {
+        // Perform aggregation using the MongoDB Java driver
+        return collection.aggregate(Arrays.asList(
+                // Group users by 'diet_type' and 'country' and calculate the count of each group
+                new Document("$group",
+                        new Document("_id",
+                                new Document("diet_type", "$diet_type").append("country", "$country"))
+                                .append("count", new Document("$sum", 1))
+                ),
+                // Group the data by 'diet_type' and construct an array of countries with their percentages
+                new Document("$group",
+                        new Document("_id", "$_id.diet_type")
+                                .append("countries",
+                                        new Document("$push",
+                                                new Document("country", "$_id.country")
+                                                        .append("percentage",
+                                                                new Document("$multiply",
+                                                                        Arrays.asList(
+                                                                                new Document("$divide", Arrays.asList("$count", new Document("$sum", "$count"))),
+                                                                                100
+                                                                        )
+                                                                )
+                                                        )
+                                        )
+                                )
+                                .append("maxPercentage",
+                                        new Document("$max",
+                                                new Document("$multiply",
+                                                        Arrays.asList(
+                                                                new Document("$divide", Arrays.asList("$count", new Document("$sum", "$count"))),
+                                                                100
+                                                        )
+                                                )
+                                        )
+                                )
+                ),
+                // Project the final structure and remove the unnecessary '_id' field
+                new Document("$project",
+                        new Document("diet_type", "$_id")
+                                .append("countries",
+                                        new Document("$filter",
+                                                new Document("input", "$countries")
+                                                        .append("as", "country")
+                                                        .append("cond",
+                                                                new Document("$eq",
+                                                                        Arrays.asList("$$country.percentage", "$maxPercentage")
+                                                                )
+                                                        )
+                                        )
+                                )
+                                .append("_id", 0)
+                )
+        ));
+        }
+    
     
     public MongoCollection<Document> getCollection() {
         return this.collection;

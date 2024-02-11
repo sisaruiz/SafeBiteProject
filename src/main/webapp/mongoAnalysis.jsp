@@ -30,14 +30,22 @@
     String databaseName = "SafeBite";
     String productsCollectionName = "Products";
     String reviewsCollectionName = "Reviews";
+    String usersCollectionName = "Users";
 
     MongoAggregations productsAggregations = new MongoAggregations(connectionString, databaseName, productsCollectionName);
     MongoAggregations reviewsAggregations = new MongoAggregations(connectionString, databaseName, reviewsCollectionName);
+    MongoAggregations usersAggregations = new MongoAggregations(connectionString, databaseName, usersCollectionName);
+    
 
     AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
     List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
     List<Document> mostReviewedProducts = reviewsAggregations.getMostReviewedProducts(reviewsAggregations.getCollection(), 10);
+
     List<Document> topReviewersAndAverageRating = reviewsAggregations.getTopReviewersAndAverageRating(10);
+
+    AggregateIterable<Document> dietTypePercentage = usersAggregations.analizeCountriesLeadingDietsPercentage();
+    
+
 %>
 
 <h1>Most Reviewed Product</h1>
@@ -78,6 +86,31 @@
         </tr>
     <% } %>
 </table>
+
+
+<h1>Diet Type Percentage</h1>
+<%
+    for (Document dietType : dietTypePercentage) {
+        String dietTypeName = dietType.getString("diet_type");
+        List<Document> countries = (List<Document>) dietType.get("countries");
+%>
+        <h2><%= dietTypeName %></h2>
+        <table border="1">
+            <tr>
+                <th>Country</th>
+                <th>Percentage</th>
+            </tr>
+            <% for (Document country : countries) { %>
+                <tr>
+                    <td><%= country.getString("country") %></td>
+                    <td><%= country.getDouble("percentage") %></td>
+                </tr>
+            <% } %>
+        </table>
+<%
+    }
+%>
+
 
 <h1>Product Category Counts</h1>
 <table border="1">
@@ -121,6 +154,7 @@
     // Close the MongoDB connections after using the results
     productsAggregations.closeConnection();
     reviewsAggregations.closeConnection();
+    usersAggregations.closeConnection();
 %>
 </body>
 </html>
