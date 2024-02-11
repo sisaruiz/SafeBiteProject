@@ -24,7 +24,7 @@ e. implement queries on mongoDB:
 - Count the number of products created by each brand owner in a specific country (products collection)
 - ~Count the number of products in each category and sort them (products collection)~
 - List the top users who have reviewed the most products and their average rating (Reviews collection)
-- Get the most reviewed product along with the count of reviews (Reviews collection)
+- ~Get the most reviewed product along with the count of reviews (Reviews collection)~
 - Analyze the distribution of ratings given by users over time.(Reviews Collection)
 - Identify users with similar diet types and count the number of unique countries they are from (users collection)
 
