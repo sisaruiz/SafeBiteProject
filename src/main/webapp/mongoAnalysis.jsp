@@ -27,28 +27,44 @@
 <%
     String connectionString = "mongodb://localhost:27017";
     String databaseName = "SafeBite";
-    String collectionName = "Products";
+    String productsCollectionName = "Products";
+    String reviewsCollectionName = "Reviews";
 
-    MongoAggregations mongoAggregations = new MongoAggregations(connectionString, databaseName, collectionName);
-    AggregateIterable<Document> result = mongoAggregations.getProductCategoryCounts();
-    List<Document> results1 = mongoAggregations.getProductCountByBrandAndCountry();
+    MongoAggregations productsAggregations = new MongoAggregations(connectionString, databaseName, productsCollectionName);
+    MongoAggregations reviewsAggregations = new MongoAggregations(connectionString, databaseName, reviewsCollectionName);
+
+    AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
+    List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
+    Document mostReviewedProduct = reviewsAggregations.getMostReviewedProduct(reviewsAggregations.getCollection());
 %>
 
-<h1>Product Category Counts</h1>
+<h1>Most Reviewed Product</h1>
+<table border="1">
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Review Count</th>
+    </tr>
+    <tr>
+        <td><%= mostReviewedProduct.getString("ProductID") %></td>
+        <td><%= mostReviewedProduct.getString("ProductName") %></td>
+        <td><%= mostReviewedProduct.getInteger("reviewCount") %></td>
+    </tr>
+</table>
 
+<h1>Product Category Counts</h1>
 <table border="1">
     <tr>
         <th>Category</th>
         <th>Count</th>
     </tr>
-    <% for (Document document : result) { %>
+    <% for (Document document : productCategoryCounts) { %>
         <tr>
             <td><%= formatCategory(document.get("_id")) %></td>
             <td><%= document.get("count") %></td>
         </tr>
     <% } %>
 </table>
-
 
 <h1>Product Count by Brand and Country</h1>
 <table border="1">
@@ -57,7 +73,7 @@
         <th>Country</th>
         <th>Product Count</th>
     </tr>
-    <% for (Document doc : results1) { %>
+    <% for (Document doc : productCountByBrandAndCountry) { %>
         <tr>
             <td><%= doc.getString("brandOwner") %></td>
             <td><%= doc.getString("country") %></td>
@@ -67,9 +83,9 @@
 </table>
 
 <%
-    // Close the MongoDB connection after using the results
-    mongoAggregations.closeConnection();
-
+    // Close the MongoDB connections after using the results
+    productsAggregations.closeConnection();
+    reviewsAggregations.closeConnection();
 %>
 </body>
 </html>

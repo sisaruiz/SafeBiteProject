@@ -82,6 +82,32 @@ public class MongoAggregations {
         return results;
     }
     
+    
+    public static Document getMostReviewedProduct(MongoCollection<Document> reviewsCollection) {
+        // Aggregation pipeline
+        List<Document> pipeline = Arrays.asList(
+                new Document("$group", new Document("_id",
+                        new Document("ProductID", "$ProductID").append("ProductName", "$ProductName"))
+                        .append("reviewCount", new Document("$sum", 1))),
+                new Document("$sort", new Document("reviewCount", -1)),
+                new Document("$limit", 1),
+                new Document("$project", new Document("_id", 0)
+                        .append("ProductID", "$_id.ProductID")
+                        .append("ProductName", "$_id.ProductName")
+                        .append("reviewCount", 1))
+        );
+
+        // Execute the aggregation pipeline
+        AggregateIterable<Document> aggregationResult = reviewsCollection.aggregate(pipeline);
+
+        // Get the result as a Document
+        return aggregationResult.first();
+    }
+    
+    public MongoCollection<Document> getCollection() {
+        return this.collection;
+    }
+
 
     public void closeConnection() {
         if (mongoClient != null) {
