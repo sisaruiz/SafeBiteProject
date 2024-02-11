@@ -107,6 +107,32 @@ public class MongoAggregations {
 
         return mostReviewedProducts;
     }
+    
+    public List<Document> getTopReviewersAndAverageRating(int limit) {
+        // Aggregation pipeline
+        List<Document> pipeline = Arrays.asList(
+                new Document("$group", new Document("_id", "$User")
+                        .append("totalProductsReviewed", new Document("$sum", 1))
+                        .append("averageRating", new Document("$avg", "$Review Rating"))),
+                new Document("$sort", new Document("totalProductsReviewed", -1)),
+                new Document("$limit", limit),
+                new Document("$project", new Document("_id", 0)
+                        .append("User", "$_id")
+                        .append("totalProductsReviewed", 1)
+                        .append("averageRating", 1))
+        );
+
+        // Execute the aggregation pipeline
+        AggregateIterable<Document> aggregationResult = collection.aggregate(pipeline);
+
+        // Convert the result to a list of documents
+        List<Document> topReviewersAndAverageRating = new ArrayList<>();
+        for (Document document : aggregationResult) {
+            topReviewersAndAverageRating.add(document);
+        }
+
+        return topReviewersAndAverageRating;
+    }
 
     
     public MongoCollection<Document> getCollection() {

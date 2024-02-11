@@ -37,6 +37,7 @@
     AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
     List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
     List<Document> mostReviewedProducts = reviewsAggregations.getMostReviewedProducts(reviewsAggregations.getCollection(), 10);
+    List<Document> topReviewersAndAverageRating = reviewsAggregations.getTopReviewersAndAverageRating(10);
 %>
 
 <h1>Most Reviewed Product</h1>
@@ -91,6 +92,29 @@
         </tr>
     <% } %>
 </table>
+
+<h1>Top 10 users with most reviewed products and average rating</h1>
+<table border="1">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Total Products Reviewed</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% 
+                for (Document reviewer : topReviewersAndAverageRating) {
+                	double averageRating = reviewer.getDouble("averageRating");
+            %>
+            <tr>
+                <td><%= reviewer.getString("User") %></td>
+                <td><%= reviewer.getInteger("totalProductsReviewed") %></td>
+                <td><%= String.format("%.3f", averageRating) %></td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
 
 
 <%
