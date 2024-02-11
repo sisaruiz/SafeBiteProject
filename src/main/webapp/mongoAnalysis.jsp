@@ -3,6 +3,7 @@
 <%@ page import="com.mongodb.client.AggregateIterable" %>
 <%@ page import="org.bson.Document" %>
 <%@ page import="mongo.MongoAggregations" %>
+<%@ page import="org.bson.types.ObjectId" %> 
 
 <html>
 
@@ -46,7 +47,14 @@
         <th>Review Count</th>
     </tr>
     <tr>
-        <td><%= mostReviewedProduct.getString("ProductID") %></td>
+        <td>
+            <% 
+                Object productIdObj = mostReviewedProduct.get("_id");
+                if (productIdObj instanceof ObjectId) {
+                    out.print(((ObjectId) productIdObj).toString());
+                }
+            %>
+        </td>
         <td><%= mostReviewedProduct.getString("ProductName") %></td>
         <td><%= mostReviewedProduct.getInteger("reviewCount") %></td>
     </tr>
