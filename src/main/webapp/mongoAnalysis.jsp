@@ -17,6 +17,7 @@
 
     MongoAggregations mongoAggregations = new MongoAggregations(connectionString, databaseName, collectionName);
     AggregateIterable<Document> result = mongoAggregations.getProductCategoryCounts();
+    List<Document> results1 = mongoAggregations.getProductCountByBrandAndCountry();
 %>
 
 <h1>Product Category Counts</h1>
@@ -34,10 +35,26 @@
     <% } %>
 </table>
 
+
+<h1>Product Count by Brand and Country</h1>
+<table border="1">
+    <tr>
+        <th>Brand Owner</th>
+        <th>Country</th>
+        <th>Product Count</th>
+    </tr>
+    <% for (Document doc : results1) { %>
+        <tr>
+            <td><%= doc.getString("brandOwner") %></td>
+            <td><%= doc.getString("country") %></td>
+            <td><%= doc.getInteger("productCount") %></td>
+        </tr>
+    <% } %>
+</table>
+
 <%
     // Close the MongoDB connection after using the results
     mongoAggregations.closeConnection();
 %>
-
 </body>
 </html>
