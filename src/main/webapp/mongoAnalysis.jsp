@@ -13,7 +13,7 @@
 
 <%
     String connectionString = "mongodb://localhost:27017";
-    String databaseName = "yourDatabaseName";
+    String databaseName = "SafeBite";
     String collectionName = "Products";
 
     MongoAggregations mongoAggregations = new MongoAggregations(connectionString, databaseName, collectionName);
