@@ -4,7 +4,7 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.sort;
-import static com.mongodb.client.model.Sorts.descending;
+import static com.mongodb.client.model.Sorts.*;
 
 import org.bson.Document;
 
@@ -14,22 +14,11 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-<<<<<<< Updated upstream
-=======
-import com.mongodb.client.model.Sorts;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import static com.mongodb.client.model.Accumulators.sum;
-import static com.mongodb.client.model.Aggregates.group;
-import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Sorts.*;
->>>>>>> Stashed changes
-
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,21 +47,24 @@ public class MongoAggregations {
     }
     
     public List<Document> getProductCountByBrandAndCountry() {
-        List<Bson> pipeline = Arrays.asList(
-                // Match documents with both brands and countries_en fields
-                match(and(exists("brands"), exists("countries_en"))),
+    	List<Bson> pipeline = Arrays.asList(
+    		    // Match documents with both brands and countries_en fields
+    		    match(and(exists("brands"), exists("countries_en"))),
 
-                // Group by brand owner and country and count the number of products
-                group(and(eq("brands", "$brands"), eq("country", "$countries_en")),
-                        sum("productCount", 1)),
+    		    // Group by brand owner and country and count the number of products
+    		    group(and(eq("brands", "$brands"), eq("countries_en", "$countries_en")),
+    		            sum("productCount", 1)),
 
-                // Project the results to rename the _id field and include the productCount
-                project(fields(
-                	    computed("brandOwner", "$_id.brands"),
-                	    computed("country", "$_id.country"),
-                	    include("productCount"),
-                	    excludeId()))
-        );
+    		    // Project the results to rename the _id field and include the productCount
+    		    project(fields(
+    		        computed("brandOwner", "$_id.brands"),
+    		        computed("country", "$_id.countries_en"),
+    		        include("productCount"),
+    		        excludeId())),
+
+    		    // Sort the results if needed
+    		    sort(ascending("brandOwner", "country"))
+    		);
 
         MongoCursor<Document> cursor = collection.aggregate(pipeline).iterator();
         List<Document> results = new ArrayList<>();
