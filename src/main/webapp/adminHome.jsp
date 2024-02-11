@@ -71,5 +71,12 @@ Welcome, <%=session.getAttribute("uname")%>
     <input type="submit" value="System Analysis">
 </form>
 
+<br>
+<!-- Add a button to navigate to mongoAnalysis.jsp -->
+<form action="mongoAnalysis.jsp">
+    <input type="submit" value="Mongo Analysis">
+</form>
+<br>
+
 </body>
 </html>

@@ -1,1 +1,9 @@
-/dao/
+/model/
+/product/
+/review/
+/search/
+/signup/
+/update/
+/user/
+/utilities/
+/mongo/
