@@ -26,7 +26,7 @@ e. implement queries on mongoDB:
 - List the top users who have reviewed the most products and their average rating (Reviews collection)
 - ~Get the most reviewed product along with the count of reviews (Reviews collection)~
 - Analyze the distribution of ratings given by users over time.(Reviews Collection)
-- Identify users with similar diet types and count the number of unique countries they are from (users collection)
+- List countries with the highest percentage of people following each diet type (users collection)
 
 f. implement queries on neo4j:
 - ~Which are the most popular users (highest number of users following him)?~
