@@ -32,6 +32,7 @@ f. implement queries on neo4j:
 - ~Which are the most popular users (highest number of users following him)?~
 - ~What are the most followed diets among users, and how many users follow each diet?~
 - ~Which allergens are most prevalent among users, and how many users are allergic to each allergen?~
+- modify the code so that someone who follows diet=none gets recommendations. Don't create relationships "IS_COMPATIBLE_WITH"
 
 g. ~display results of those queries~
 
