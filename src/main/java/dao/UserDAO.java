@@ -81,22 +81,6 @@ public class UserDAO {
 
         return users;
     }
-
-    
-    
-    public void createUserInNeo4j(User user) {
-        neo4jManager.createNeo4jUserNode(user.getName());
-        
-        if (user.getDiet() != null) {
-            neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
-        }
-
-        if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
-            for (String allergen : user.getListAllergens()) {
-                neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
-            }
-        }
-    }
     
     
     public void updateUserProfile(User user) {
