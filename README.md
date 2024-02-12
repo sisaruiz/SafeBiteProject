@@ -25,7 +25,7 @@ e. implement queries on mongoDB:
 - ~Count the number of products in each category and sort them (products collection)~
 - ~List the top users who have reviewed the most products and their average rating (Reviews collection)~
 - ~Get the most reviewed product along with the count of reviews (Reviews collection)~
-- Analyze the distribution of ratings given by users over time.(Reviews Collection)
+- ~Analyze the distribution of ratings given by users over time.(Reviews Collection)~
 - ~Calculate the Percentage of Male and Female Users for each diet_type (users collection)~
 
 f. implement queries on neo4j:
