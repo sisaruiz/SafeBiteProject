@@ -14,6 +14,10 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Projections;
+
 import org.bson.conversions.Bson;
 
 import static com.mongodb.client.model.Filters.*;
@@ -136,60 +140,37 @@ public class MongoAggregations {
 }
    
 
-    public AggregateIterable<Document> analizeCountriesLeadingDietsPercentage() {
-        // Perform aggregation using the MongoDB Java driver
+    public AggregateIterable<Document> calculateGenderPercentageByDietType() {
+        Document groupByGenderAndDietType = new Document("$group", new Document("_id",
+                new Document("diet_type", "$diet_type")
+                        .append("gender", "$gender"))
+                .append("count", new Document("$sum", 1)));
+
+        Document groupByDietType = new Document("$group", new Document("_id", "$_id.diet_type")
+                .append("totalUsers", new Document("$sum", "$count"))
+                .append("genderCounts", new Document("$push",
+                        new Document("gender", "$_id.gender")
+                                .append("count", "$count"))));
+
+        Document projectResult = new Document("$project", new Document("_id", 0)
+                .append("diet_type", "$_id")
+                .append("percentages", new Document("$map",
+                        new Document("input", "$genderCounts")
+                                .append("as", "gc")
+                                .append("in", new Document("gender", "$$gc.gender")
+                                        .append("percentage", new Document("$multiply",
+                                                Arrays.asList(new Document("$divide",
+                                                        Arrays.asList("$$gc.count", "$totalUsers")),
+                                                        100)))))));
+
         return collection.aggregate(Arrays.asList(
-                // Group users by 'diet_type' and 'country' and calculate the count of each group
-                new Document("$group",
-                        new Document("_id",
-                                new Document("diet_type", "$diet_type").append("country", "$country"))
-                                .append("count", new Document("$sum", 1))
-                ),
-                // Group the data by 'diet_type' and construct an array of countries with their percentages
-                new Document("$group",
-                        new Document("_id", "$_id.diet_type")
-                                .append("countries",
-                                        new Document("$push",
-                                                new Document("country", "$_id.country")
-                                                        .append("percentage",
-                                                                new Document("$multiply",
-                                                                        Arrays.asList(
-                                                                                new Document("$divide", Arrays.asList("$count", new Document("$sum", "$count"))),
-                                                                                100
-                                                                        )
-                                                                )
-                                                        )
-                                        )
-                                )
-                                .append("maxPercentage",
-                                        new Document("$max",
-                                                new Document("$multiply",
-                                                        Arrays.asList(
-                                                                new Document("$divide", Arrays.asList("$count", new Document("$sum", "$count"))),
-                                                                100
-                                                        )
-                                                )
-                                        )
-                                )
-                ),
-                // Project the final structure and remove the unnecessary '_id' field
-                new Document("$project",
-                        new Document("diet_type", "$_id")
-                                .append("countries",
-                                        new Document("$filter",
-                                                new Document("input", "$countries")
-                                                        .append("as", "country")
-                                                        .append("cond",
-                                                                new Document("$eq",
-                                                                        Arrays.asList("$$country.percentage", "$maxPercentage")
-                                                                )
-                                                        )
-                                        )
-                                )
-                                .append("_id", 0)
-                )
+                groupByGenderAndDietType,
+                groupByDietType,
+                projectResult
         ));
-        }
+    }
+    
+
     
     
     public MongoCollection<Document> getCollection() {

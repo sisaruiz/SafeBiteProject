@@ -1,4 +1,8 @@
+/dao/
+/follow/
+/login/
 /model/
+/mongo/
 /product/
 /review/
 /search/
@@ -6,5 +10,3 @@
 /update/
 /user/
 /utilities/
-/mongo/
-/dao/
