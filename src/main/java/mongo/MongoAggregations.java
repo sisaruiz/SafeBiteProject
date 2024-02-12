@@ -4,16 +4,22 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Accumulators.push;
+
 import static com.mongodb.client.model.Sorts.*;
 
 import org.bson.Document;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Projections;
+
 import org.bson.conversions.Bson;
 
 import static com.mongodb.client.model.Filters.*;
@@ -190,6 +196,59 @@ public class MongoAggregations {
                 )
         ));
         }
+    
+    public List<Document> getUserRatingDistributionOverTime(String username) {
+        List<Document> userRatingDistribution = new ArrayList<>();
+
+        List<Bson> pipeline = Arrays.asList(
+                // Stage 1: Match documents where the "User" field matches the provided username
+                match(eq("User", username)),
+
+                // Stage 2: Group documents by the "Review Date" field
+                group("$Review Date",
+                        Accumulators.push("ratings", "$Review Rating"), // Collect "Review Rating" values in an array
+                        sum("count", 1) // Count the number of documents in each group
+                ),
+
+                // Stage 3: Project the result to shape the output
+                project(Projections.fields(
+                        Projections.excludeId(), // Exclude the default "_id" field
+                        Projections.computed("Review Date", new Document("$toDate", "$_id")), // Convert "_id" to date
+                        Projections.include("ratings", "count") // Include the "ratings" and "count" fields
+                )),
+
+                // Stage 4: Add an additional field "averageRating" using $cond and $arrayElemAt
+                addFields(new Field<>("averageRating", new Document("$cond",
+                        Arrays.asList(
+                                new Document("$eq", Arrays.asList("$ratings", Arrays.asList((Object) null))),
+                                null,
+                                new Document("$arrayElemAt", Arrays.asList("$ratings", 0))
+                        )
+                ))),
+
+                // Stage 5: Sort the result by "Review Date" in descending order
+                sort(descending("Review Date"))
+        );
+        
+     // Print the intermediate results after each stage
+        for (Bson stage : pipeline) {
+            System.out.println("Stage: " + stage.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()));
+        }
+
+        collection.aggregate(pipeline).into(userRatingDistribution);
+        
+        // Print the components of the returned list
+        for (Document document : userRatingDistribution) {
+        	List<?> ratings = document.get("ratings", List.class);
+        	System.out.println("Ratings: " + ratings);
+
+            System.out.println("Date: " + document.getDate("Review Date"));
+            System.out.println("Average Rating: " + document.get("averageRating"));
+            System.out.println("Count: " + document.getInteger("count"));
+        }
+
+        return userRatingDistribution;
+    }
     
     
     public MongoCollection<Document> getCollection() {
