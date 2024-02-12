@@ -13,9 +13,7 @@ import static org.neo4j.driver.Values.parameters;
 
 import model.Product;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Neo4jManager {
     private Driver neo4jDriver;
@@ -27,44 +25,81 @@ public class Neo4jManager {
     }
 
     public void createNeo4jUserNode(String userName) {
-        neo4jSession.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating Neo4j User Node: " + e.getMessage());
+        }
     }
 
+
     public void createNeo4jUserAllergyRelationship(String userName, String allergen) {
-        neo4jSession.run("MATCH (u:User {user_name: $userName}), (a:Allergen {name: $allergen}) CREATE (u)-[:HAS_ALLERGEN]->(a)",
-                parameters("userName", userName, "allergen", allergen));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (u:User {user_name: $userName}), (a:Allergen {name: $allergen}) CREATE (u)-[:HAS_ALLERGEN]->(a)",
+                    parameters("userName", userName, "allergen", allergen));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating Neo4j User-Allergy Relationship: " + e.getMessage());
+        }
     }
 
     public void createNeo4jUserDietRelationship(String userName, String dietType) {
-        neo4jSession.run("MATCH (u:User {user_name: $user_name}), (d:Diet {type: $dietType}) CREATE (u)-[:HAS_DIET]->(d)",
-                parameters("user_name", userName, "dietType", dietType));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (u:User {user_name: $user_name}), (d:Diet {type: $dietType}) CREATE (u)-[:HAS_DIET]->(d)",
+                    parameters("user_name", userName, "dietType", dietType));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating Neo4j User-Diet Relationship: " + e.getMessage());
+        }
     }
     
     public void deleteNeo4jUserDietRelationship(String userName) {
-        neo4jSession.run("MATCH (u:User {user_name: $user_name})-[r:HAS_DIET]->(d:Diet) DELETE r",
-                parameters("user_name", userName));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_DIET]->(d:Diet) DELETE r",
+                    parameters("user_name", userName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error deleting Neo4j User-Diet Relationship: " + e.getMessage());
+        }
     }
 
     public void deleteNeo4jUserAllergenRelationships(String userName) {
-        neo4jSession.run("MATCH (u:User {user_name: $user_name})-[r:HAS_ALLERGEN]->(a:Allergen) DELETE r",
-                parameters("user_name", userName));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_ALLERGEN]->(a:Allergen) DELETE r",
+                    parameters("user_name", userName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error deleting Neo4j User-Allergen Relationships: " + e.getMessage());
+        }
     }
     
     public void deleteNeo4jUserNodes(String userName) {
-        neo4jSession.run("MATCH (u:User {user_name: $user_name}) DETACH DELETE u",
-                parameters("user_name", userName));
-    }
-    
-    public void createNeo4jRelationshipsFromUserToAllergens(String userName, String[] allergenNames) {
-    	
-    	for (String allergen : allergenNames) {
-    	    createNeo4jUserAllergyRelationship(userName, allergen);
-    	}
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (u:User {user_name: $user_name}) DETACH DELETE u",
+                    parameters("user_name", userName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error deleting Neo4j User Nodes: " + e.getMessage());
+        }
     }
     
     public void createNeo4jProductNode(String productId, String productName) {
-        neo4jSession.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating Neo4j Product Node: " + e.getMessage());
+        }
     }
+
     
     public void createNeo4jFollowRelationship(String userFrom, String userTo) {
         neo4jSession.run(
@@ -194,7 +229,13 @@ public class Neo4jManager {
     
 
     public void deleteNeo4jProductNode(String productId) {
-        neo4jSession.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
+        try (Transaction transaction = neo4jSession.beginTransaction()) {
+            transaction.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error deleting Neo4j Product Node: " + e.getMessage());
+        }
     }
     
     public List<String> getUserFollowers(String userName) {

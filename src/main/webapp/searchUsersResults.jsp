@@ -35,6 +35,7 @@
                     <% } %>
                     <!-- Display delete button only if admin -->
                     <% if (Objects.nonNull(isAdmin) && isAdmin) { %>
+                    	<%= user.getName() %>
                         <form method="post" action="DeleteUserServlet">
                             <input type="hidden" name="username" value="<%= user.getName() %>">
                             <input type="submit" value="Delete User">
