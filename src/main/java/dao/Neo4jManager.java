@@ -246,20 +246,26 @@ public class Neo4jManager {
         List<String> recommendedProducts = new ArrayList<>();
 
         try {
-            Result result = neo4jSession.run(
-                "MATCH (user:User {user_name: $userName})-[:HAS_DIET]->(diet:Diet) " +
-                "OPTIONAL MATCH (user)-[:HAS_ALLERGEN]->(allergen:Allergen) " +
-                "MATCH (product:Product)-[:IS_COMPATIBLE_WITH]->(diet) " +
-                "WHERE NOT (allergen IS NOT NULL AND (product)-[:CONTAINS]->(allergen)) " +
-                "AND NOT (user)-[:LIKES]->(product) " +
-                "RETURN DISTINCT product.name AS productName " +
-                "LIMIT 10",
-                Values.parameters("userName", userName)
-            );
+        	Result result = neo4jSession.run(
+        		    "MATCH (user:User {user_name: $userName})-[:HAS_DIET]->(diet:Diet) " +
+        		    "OPTIONAL MATCH (user)-[:HAS_ALLERGEN]->(allergen:Allergen) " +
+        		    "MATCH (product:Product)" +
+        		    "WHERE " +
+        		    "((diet.type = 'none' AND NOT (allergen IS NOT NULL AND (product)-[:CONTAINS]->(allergen)) AND NOT (user)-[:LIKES]->(product)) " +
+        		    "OR " +
+        		    "(diet.type <> 'none' AND (product)-[:IS_COMPATIBLE_WITH]->(diet) AND NOT (allergen IS NOT NULL AND (product)-[:CONTAINS]->(allergen)) AND NOT (user)-[:LIKES]->(product))) " +
+        		    "RETURN DISTINCT product.id AS productId, product.name AS productName " +
+        		    "LIMIT 10",
+        		    Values.parameters("userName", userName)
+        		);
 
-            while (result.hasNext()) {
+
+        	while (result.hasNext()) {
                 Record record = result.next();
-                recommendedProducts.add(record.get("productName").asString());
+                String productId = record.get("productId").asString();
+                String productName = record.get("productName").asString();
+                String combined = productId + "-" + productName;
+                recommendedProducts.add(combined);
             }
 
             return recommendedProducts;

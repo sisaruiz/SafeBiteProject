@@ -39,8 +39,12 @@ Welcome, <%=session.getAttribute("uname")%>
 <section>
     <h3>Explore recommended products ...</h3>
     <% if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
-           for (String product : recommendedProducts) { %>
-               <p><a href="productDetails.jsp?product=<%= product %>"><%= product %></a></p>
+           for (String recommendedProduct : recommendedProducts) {
+               String[] productInfo = recommendedProduct.split("-"); // Assuming the delimiter is "-"
+               String productId = productInfo[0];
+               String productName = productInfo[1];
+    %>
+               <p><a href="productDetails.jsp?productId=<%= productId %>"><%= productName %></a></p>
     <%  }
        } else { %>
            <p>No recommended products found. Try updating your preferences.</p>
