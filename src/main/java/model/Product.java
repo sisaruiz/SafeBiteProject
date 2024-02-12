@@ -114,6 +114,11 @@ public class Product {
     }
 
     public String getImgURL() {
+        // Check if imgURL is null or empty
+        if (imgURL == null || imgURL.isEmpty()) {
+            // Assign default URL if null or empty
+            imgURL = "https://i.postimg.cc/5YkDg6Zb/Untitled.png";
+        }
         return imgURL;
     }
 
