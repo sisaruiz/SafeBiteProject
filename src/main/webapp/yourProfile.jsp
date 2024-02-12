@@ -52,68 +52,51 @@
     <br>
     <a href="editProfile.jsp">Edit profile</a>
     <br>
-    <canvas id="lineChart" width="400" height="200"></canvas>
-    
-    
-    <%
-	    // Prepare data for Chart.js
-	    List<String> labels = new ArrayList<>();
-	    List<Double> averageRatings = new ArrayList<>();
-	    List<Integer> counts = new ArrayList<>();
-	
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    <canvas id="lineChart" style="width: 400px; height: 300px;"></canvas>
 
-	    for (Document document : userRatingDistribution) {
-	        Date date = document.getDate("Review Date");
-	        labels.add("'" + dateFormat.format(date) + "'");
-	        Number averageRatingNumber = (Number) document.get("averageRating");
-	        double averageRating = averageRatingNumber.doubleValue();
-	        averageRatings.add(averageRating);
-	        counts.add(document.getInteger("count"));
-	    }
-	%>
-	<script>
-	
-    var ctx = document.getElementById('lineChart').getContext('2d');
-    var data = {
-        labels: <%= labels %>,
-        datasets: [{
-            label: 'Average Rating',
-            data: <%= averageRatings %>,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            fill: false
-        }]
-    };
+<script>
+    // Prepare data for Chart.js
+    var labels = [];
+    var data = [];
 
-    var options = {
-        scales: {
-            x: {
-                type: 'time', // Use 'time' for date values
-                position: 'bottom',
-                title: {
-                    display: true,
-                    text: 'Date'
+    <% for (Document document : userRatingDistribution) { %>
+        labels.push('<%= new SimpleDateFormat("dd MMM yyyy").format(document.getDate("Review Date")) %>');
+        data.push(<%= ((Number)document.get("averageRating")).doubleValue() %>); // Convert to double
+    <% } %>
+
+    // Configure the line chart
+    var config = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Average Rating',
+                data: data,
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+        	responsive: false, // Ensure the chart doesn't resize to fit the container
+            maintainAspectRatio: false, // Maintain the aspect ratio
+            scales: {
+                x: {
+                    type: 'category',
+                    labels: labels
                 },
-                time: {
-                    unit: 'day',
-                    parser: 'YYYY MMM DD', // Match the format of your dates
-                    tooltipFormat: 'YYYY MMM DD', // Format for tooltips
-                },
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: 'Average Rating'
+                y: {
+                    beginAtZero: false,
+                    min: 1,
+                    max: 5 // Assuming the rating scale is from 0 to 5
                 }
             }
         }
     };
 
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: data,
-        options: options
-    });
+    // Create and render the chart
+    var ctx = document.getElementById('lineChart').getContext('2d');
+    var myChart = new Chart(ctx, config);
 </script>
     
     <%

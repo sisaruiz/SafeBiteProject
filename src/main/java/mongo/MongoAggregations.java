@@ -4,8 +4,6 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.sort;
-import static com.mongodb.client.model.Accumulators.push;
-
 import static com.mongodb.client.model.Sorts.*;
 
 import org.bson.Document;
@@ -18,7 +16,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Field;
-import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Projections;
 
 import org.bson.conversions.Bson;
@@ -205,10 +202,10 @@ public class MongoAggregations {
                 ))),
 
                 // Stage 5: Sort the result by "Review Date" in descending order
-                sort(descending("Review Date"))
+                sort(ascending("Review Date"))
         );
         
-     // Print the intermediate results after each stage
+        // Print the intermediate results after each stage
         for (Bson stage : pipeline) {
             System.out.println("Stage: " + stage.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()));
         }
