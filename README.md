@@ -26,14 +26,14 @@ e. implement queries on mongoDB:
 - ~List the top users who have reviewed the most products and their average rating (Reviews collection)~
 - ~Get the most reviewed product along with the count of reviews (Reviews collection)~
 - Analyze the distribution of ratings given by users over time.(Reviews Collection)
-- for each diet type list countries with the highest percentage of people following this diet (users collection)
+- ~Calculate the Percentage of Male and Female Users for each diet_type (users collection)~
 
 f. implement queries on neo4j:
 - ~Which are the most popular users (highest number of users following him)?~
 - ~What are the most followed diets among users, and how many users follow each diet?~
 - ~Which allergens are most prevalent among users, and how many users are allergic to each allergen?~
 
-g. display results of those queries
+g. ~display results of those queries~
 
 h. make it beautiful
 

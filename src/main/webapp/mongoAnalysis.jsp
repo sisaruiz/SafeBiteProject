@@ -18,6 +18,21 @@
             return category.toString();
         }
     }
+
+double getPercentage(Document result, String gender) {
+    List<Document> percentages = result.getList("percentages", Document.class);
+    for (Document percentage : percentages) {
+        if (percentage.getString("gender").equals(gender)) {
+            return percentage.getDouble("percentage");
+        }
+    }
+    return 0.0;
+}
+
+String formatPercentage(double percentage) {
+    return String.format("%.2f", percentage);
+}
+
 %>
 
 <head>
@@ -40,11 +55,9 @@
     AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
     List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
     List<Document> mostReviewedProducts = reviewsAggregations.getMostReviewedProducts(reviewsAggregations.getCollection(), 10);
-
     List<Document> topReviewersAndAverageRating = reviewsAggregations.getTopReviewersAndAverageRating(10);
 
-    AggregateIterable<Document> dietTypePercentage = usersAggregations.analizeCountriesLeadingDietsPercentage();
-    
+    AggregateIterable<Document> genderPercentageByDietType = usersAggregations.calculateGenderPercentageByDietType();
 
 %>
 
@@ -87,44 +100,28 @@
     <% } %>
 </table>
 
-
-<h1>Diet Type Percentage</h1>
-<%
-    for (Document dietType : dietTypePercentage) {
-        String dietTypeName = dietType.getString("diet_type");
-        List<Document> countries = (List<Document>) dietType.get("countries");
-%>
-        <h2><%= dietTypeName %></h2>
-        <table border="1">
-            <tr>
-                <th>Country</th>
-                <th>Percentage</th>
-            </tr>
-            <% for (Document country : countries) { %>
-                <tr>
-                    <td><%= country.getString("country") %></td>
-                    <td><%= country.getDouble("percentage") %></td>
-                </tr>
-            <% } %>
-        </table>
-<%
-    }
-%>
+<br>
 
 
-<h1>Product Category Counts</h1>
+<h1>Gender Percentage by Diet Type</h1>
 <table border="1">
     <tr>
-        <th>Category</th>
-        <th>Count</th>
+        <th>Diet Type</th>
+        <th>Male %</th>
+        <th>Female %</th>
+        <th>Other %</th>
     </tr>
-    <% for (Document document : productCategoryCounts) { %>
+    <% for (Document result : genderPercentageByDietType) { %>
         <tr>
-            <td><%= formatCategory(document.get("_id")) %></td>
-            <td><%= document.get("count") %></td>
+            <td><%= result.getString("diet_type") %></td>
+            <td><%= formatPercentage(getPercentage(result, "Male")) %></td>
+            <td><%= formatPercentage(getPercentage(result, "Female")) %></td>
+            <td><%= formatPercentage(getPercentage(result, "Other")) %></td>
         </tr>
     <% } %>
 </table>
+
+<br>
 
 <h1>Top 10 users with most reviewed products and average rating</h1>
 <table border="1">
@@ -149,12 +146,31 @@
         </tbody>
     </table>
 
+<br>
+
+<h1>Product Category Counts</h1>
+<table border="1">
+    <tr>
+        <th>Category</th>
+        <th>Count</th>
+    </tr>
+    <% for (Document document : productCategoryCounts) { %>
+        <tr>
+            <td><%= formatCategory(document.get("_id")) %></td>
+            <td><%= document.get("count") %></td>
+        </tr>
+    <% } %>
+</table>
+
+<br>
+
 
 <%
     // Close the MongoDB connections after using the results
     productsAggregations.closeConnection();
     reviewsAggregations.closeConnection();
     usersAggregations.closeConnection();
+    
 %>
 </body>
 </html>
