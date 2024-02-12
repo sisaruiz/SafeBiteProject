@@ -29,6 +29,10 @@ double getPercentage(Document result, String gender) {
     return 0.0;
 }
 
+String formatPercentage(double percentage) {
+    return String.format("%.2f", percentage);
+}
+
 %>
 
 <head>
@@ -103,36 +107,21 @@ double getPercentage(Document result, String gender) {
 <table border="1">
     <tr>
         <th>Diet Type</th>
-        <th>Male Percentage</th>
-        <th>Female Percentage</th>
-        <th>Other Percentage</th>
+        <th>Male %</th>
+        <th>Female %</th>
+        <th>Other %</th>
     </tr>
     <% for (Document result : genderPercentageByDietType) { %>
         <tr>
             <td><%= result.getString("diet_type") %></td>
-            <td><%= getPercentage(result, "Male") %></td>
-            <td><%= getPercentage(result, "Female") %></td>
-            <td><%= getPercentage(result, "Other") %></td>
+            <td><%= formatPercentage(getPercentage(result, "Male")) %></td>
+            <td><%= formatPercentage(getPercentage(result, "Female")) %></td>
+            <td><%= formatPercentage(getPercentage(result, "Other")) %></td>
         </tr>
     <% } %>
 </table>
-
 
 <br>
-
-<h1>Product Category Counts</h1>
-<table border="1">
-    <tr>
-        <th>Category</th>
-        <th>Count</th>
-    </tr>
-    <% for (Document document : productCategoryCounts) { %>
-        <tr>
-            <td><%= formatCategory(document.get("_id")) %></td>
-            <td><%= document.get("count") %></td>
-        </tr>
-    <% } %>
-</table>
 
 <h1>Top 10 users with most reviewed products and average rating</h1>
 <table border="1">
@@ -156,6 +145,24 @@ double getPercentage(Document result, String gender) {
             <% } %>
         </tbody>
     </table>
+
+<br>
+
+<h1>Product Category Counts</h1>
+<table border="1">
+    <tr>
+        <th>Category</th>
+        <th>Count</th>
+    </tr>
+    <% for (Document document : productCategoryCounts) { %>
+        <tr>
+            <td><%= formatCategory(document.get("_id")) %></td>
+            <td><%= document.get("count") %></td>
+        </tr>
+    <% } %>
+</table>
+
+<br>
 
 
 <%
