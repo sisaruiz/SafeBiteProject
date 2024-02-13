@@ -1,5 +1,6 @@
 package update;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class UpdateProfileServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("uname");
 
@@ -34,10 +38,14 @@ public class UpdateProfileServlet extends HttpServlet {
             user.setAllergens(allergens);
 
             // Update the user's profile in MongoDB
-            userDAO.updateUserProfile(user);
-
-            // Redirect to the user's profile page after updating
-            response.sendRedirect("yourProfile.jsp");
+            if(userDAO.updateUserProfile(user)) {
+            	// Redirect to the user's profile page after updating
+                response.sendRedirect("yourProfile.jsp");
+            }
+            else {
+            	out.println("User update failed.");
+            	response.sendRedirect("yourProfile.jsp");
+            }
         } else {
             // Handle the case where the user is not found
             response.getWriter().println("User not found");

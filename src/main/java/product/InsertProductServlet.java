@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import dao.ProductDAO;
-import dao.Neo4jManager;
 
 /**
  * Servlet implementation class InsertProductServlet
@@ -70,17 +69,19 @@ public class InsertProductServlet extends HttpServlet {
             new Date()  // Last update timestamp is set to the current date
         );
 
-        // Add the new product to the MongoDB dataset
+        // Add the new product to both databases
         ProductDAO productDAO = new ProductDAO();
-        productDAO.addProduct(newProduct);
+        if (productDAO.addProduct(newProduct)) {
+        	out.println("Product added correctly.");
+        }
+        else {
+        	out.println("Product insertion failed.");
+        }
         
-     // Add the new product to Neo4j
-        Neo4jManager neo4jManager = new Neo4jManager();
-        neo4jManager.createNeo4jProductNode(newProduct.getId(), newProduct.getName());
-
-        out.println("Product added correctly.");
-		RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
-		rd.include(request, response);
+        productDAO.closeConnections();
+        
+        RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
+        rd.include(request, response);
 	}
 
 }

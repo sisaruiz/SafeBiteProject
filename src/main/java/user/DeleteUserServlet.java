@@ -22,17 +22,22 @@ public class DeleteUserServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Get the username from the request
         String username = request.getParameter("username");
+        PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
 
         // Perform the delete operation (you should implement this in your UserDAO)
         UserDAO userDAO = new UserDAO();
-        userDAO.deleteUser(username);
-
-        // Redirect back to the search results or any other appropriate page
-        PrintWriter out = response.getWriter();
-		response.setContentType("text/html");
-        out.println("User removed successfully.");
-		RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
+        
+        if (userDAO.deleteUser(username)) {
+        	// Redirect back to the search results or any other appropriate page
+            out.println("User removed successfully.");    		
+        }
+        else {
+        	out.println("User deletion failed.");
+        }
+        RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
 		rd.include(request, response);
+        
 	}
 
 }

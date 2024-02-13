@@ -7,6 +7,7 @@ import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
+import org.neo4j.driver.exceptions.Neo4jException;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Record;
 import static org.neo4j.driver.Values.parameters;
@@ -16,88 +17,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Neo4jManager {
+	
     private Driver neo4jDriver;
     private Session neo4jSession;
 
+    
     public Neo4jManager() {
         neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4jneo"));
         neo4jSession = neo4jDriver.session();
     }
 
+    
     public void createNeo4jUserNode(String userName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error creating Neo4j User Node: " + e.getMessage());
-        }
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
+        transaction.commit();
     }
 
 
     public void createNeo4jUserAllergyRelationship(String userName, String allergen) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (u:User {user_name: $userName}), (a:Allergen {name: $allergen}) CREATE (u)-[:HAS_ALLERGEN]->(a)",
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $userName}), (a:Allergen {name: $allergen}) CREATE (u)-[:HAS_ALLERGEN]->(a)",
                     parameters("userName", userName, "allergen", allergen));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error creating Neo4j User-Allergy Relationship: " + e.getMessage());
-        }
+        transaction.commit();
     }
 
     public void createNeo4jUserDietRelationship(String userName, String dietType) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (u:User {user_name: $user_name}), (d:Diet {type: $dietType}) CREATE (u)-[:HAS_DIET]->(d)",
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $user_name}), (d:Diet {type: $dietType}) CREATE (u)-[:HAS_DIET]->(d)",
                     parameters("user_name", userName, "dietType", dietType));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error creating Neo4j User-Diet Relationship: " + e.getMessage());
-        }
+        transaction.commit();
     }
     
     public void deleteNeo4jUserDietRelationship(String userName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_DIET]->(d:Diet) DELETE r",
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_DIET]->(d:Diet) DELETE r",
                     parameters("user_name", userName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error deleting Neo4j User-Diet Relationship: " + e.getMessage());
-        }
+        transaction.commit();
     }
 
     public void deleteNeo4jUserAllergenRelationships(String userName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_ALLERGEN]->(a:Allergen) DELETE r",
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $user_name})-[r:HAS_ALLERGEN]->(a:Allergen) DELETE r",
                     parameters("user_name", userName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error deleting Neo4j User-Allergen Relationships: " + e.getMessage());
-        }
+        transaction.commit();
     }
     
     public void deleteNeo4jUserNode(String userName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (u:User {user_name: $user_name}) DETACH DELETE u",
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $user_name}) DETACH DELETE u",
                     parameters("user_name", userName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error deleting Neo4j User Nodes: " + e.getMessage());
-        }
+        transaction.commit();
     }
     
     public void createNeo4jProductNode(String productId, String productName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error creating Neo4j Product Node: " + e.getMessage());
-        }
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("CREATE (:Product {id: $productId, name: $productName})", parameters("productId", productId, "productName", productName));
+        transaction.commit();
     }
 
     
@@ -118,41 +94,38 @@ public class Neo4jManager {
     }
 
     
-    public void updateNeo4jProductNode(String productId, String productName) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (p:Product {id: $productId}) SET p.name = $productName",
-                    parameters("productId", productId, "productName", productName));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error updating Neo4j Product Node: " + e.getMessage());
-        }
+    public void updateNeo4jProductNode(Product product) {
+        Transaction transaction = neo4jSession.beginTransaction();
+        
+        // Delete all previous relationships of the node
+        transaction.run("MATCH (p:Product {id: $productId})-[r]-() DELETE r", parameters("productId", product.getId()));
+
+        // Update product name
+        transaction.run("MATCH (p:Product {id: $productId}) SET p.name = $productName",
+                    parameters("productId", product.getId(), "productName", product.getName()));
+
+        transaction.commit();
+        
+        // Create new relationships
+        createNeo4jProductAllergensRelationship(product.getId(), product.getAllergens());
+        createDietCompatibilityRelationships(product.getId(), product.getIngredients());
+
     }
     
     public void createNeo4jUserProductLikeRelationship(String userName, String productId) {
-        try (Session independentSession = neo4jDriver.session()) {
-            try (Transaction transaction = independentSession.beginTransaction()) {
-                transaction.run("MATCH (u:User {user_name: $userName}), (p:Product {id: $productId}) CREATE (u)-[:LIKES]->(p)",
-                        parameters("userName", userName, "productId", productId));
-                transaction.commit();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error creating Neo4j User-Product Like Relationship: " + e.getMessage());
-        }
+        Session independentSession = neo4jDriver.session();
+        Transaction transaction = independentSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $userName}), (p:Product {id: $productId}) CREATE (u)-[:LIKES]->(p)",
+        		parameters("userName", userName, "productId", productId));
+        transaction.commit();
     }
 
     public void deleteNeo4jUserProductLikeRelationship(String userName, String productId) {
-        try (Session independentSession = neo4jDriver.session()) {
-            try (Transaction transaction = independentSession.beginTransaction()) {
-                transaction.run("MATCH (u:User {user_name: $userName})-[r:LIKES]->(p:Product {id: $productId}) DELETE r",
+        Session independentSession = neo4jDriver.session();
+        Transaction transaction = independentSession.beginTransaction();
+        transaction.run("MATCH (u:User {user_name: $userName})-[r:LIKES]->(p:Product {id: $productId}) DELETE r",
                         parameters("userName", userName, "productId", productId));
-                transaction.commit();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error deleting Neo4j User-Product Like Relationship: " + e.getMessage());
-        }
+        transaction.commit();
     }
 
     
@@ -197,6 +170,7 @@ public class Neo4jManager {
             return null;
         }
     }
+    
     public boolean checkNeo4jUserProductLikeRelationship(String userName, String productId) {
         try {
             String cypherQuery = "MATCH (:User {user_name: $userName})-[:LIKES]->(:Product {id: $productId}) " +
@@ -229,13 +203,9 @@ public class Neo4jManager {
     
 
     public void deleteNeo4jProductNode(String productId) {
-        try (Transaction transaction = neo4jSession.beginTransaction()) {
-            transaction.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error deleting Neo4j Product Node: " + e.getMessage());
-        }
+        Transaction transaction = neo4jSession.beginTransaction();
+        transaction.run("MATCH (p:Product {id: $productId}) DETACH DELETE p", parameters("productId", productId));
+        transaction.commit();
     }
     
     public List<String> getUserFollowers(String userName) {
@@ -282,6 +252,26 @@ public class Neo4jManager {
         }
     }
     
+    public void createNeo4jProductAllergensRelationship(String productId, String allergensContained) {
+        // Split the allergens string into an array of allergen names
+        String[] allergenNames = {"Celery", "Wheat", "Rye", "Barley", "Oats", "Spelt", "Kamut", "Cabbage", 
+                                  "Broccoli", "Cauliflower", "Kale", "Brussel Sprouts", "Collard Greens", 
+                                  "Crustaceans", "Eggs", "Fish", "Milk", "Lupin", "Molluscs", "Mustard", 
+                                  "Nuts", "Peanuts", "Sesame", "Soy", "Apple", "Tomato", "Peaches"};
+
+        // Iterate over each allergen name and check if it is contained in the input string
+        for (String allergenName : allergenNames) {
+            if (allergensContained.toLowerCase().contains(allergenName.toLowerCase())) {
+                // If contained, create a relationship between the Product and Allergen nodes
+                Transaction transaction = neo4jSession.beginTransaction();
+                transaction.run("MATCH (p:Product {id: $productId}), (a:Allergen {name: $allergenName}) " +
+                                "CREATE (p)-[:CONTAINS]->(a)",
+                                parameters("productId", productId, "allergenName", allergenName.toLowerCase()));
+                transaction.commit();
+            }
+        }
+    }
+
     
     public List<String> findRecommendedProducts(String userName) {
         List<String> recommendedProducts = new ArrayList<>();
@@ -407,6 +397,73 @@ public class Neo4jManager {
         }
 
         return allergensWithUserCount;
+    }
+    
+    
+    public boolean verifyDummyUser(String userName) {
+    	try {
+            Result result = neo4jSession.run(
+                "MATCH (u:User {user_name: $userName})-[]->() RETURN COUNT(*) = 0 AS hasNoRelationships",
+                parameters("userName", userName)
+            );
+
+            return result.single().get("hasNoRelationships").asBoolean();
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void createDietCompatibilityRelationships(String productId, String ingredients) {
+        // Define the diet types
+        String[] dietTypes = {"vegan", "vegetarian", "halal", "pescatarian"};
+
+        // Iterate over each diet type and check if it's compatible with the ingredients
+        for (String dietType : dietTypes) {
+            // Check if the ingredients string contains any non-compatible ingredient for the current diet type
+            boolean isCompatible = checkCompatibility(ingredients, dietType);
+
+            if (isCompatible) {
+                // If compatible, create a relationship between the Product and Diet nodes
+                Transaction transaction = neo4jSession.beginTransaction();
+                transaction.run("MATCH (p:Product {id: $productId}), (d:Diet {type: $dietType}) " +
+                                "CREATE (p)-[:IS_COMPATIBLE_WITH]->(d)",
+                                parameters("productId", productId, "dietType", dietType));
+                transaction.commit();
+            }
+        }
+    }
+
+    // Helper method to check compatibility with diet type based on ingredients
+    private boolean checkCompatibility(String ingredients, String dietType) {
+        // Define non-compatible ingredients for each diet type
+        String[] nonCompatibleIngredients = getNonCompatibleIngredients(dietType);
+
+        // Check if any non-compatible ingredient is present in the ingredients string
+        for (String ingredient : nonCompatibleIngredients) {
+            if (ingredients.toLowerCase().contains(ingredient.toLowerCase())) {
+                return false; // Not compatible
+            }
+        }
+
+        return true; // Compatible
+    }
+
+    // Helper method to get non-compatible ingredients for a specific diet type
+    private String[] getNonCompatibleIngredients(String dietType) {
+        switch (dietType) {
+            case "vegan":
+                return new String[]{"meat", "fish", "tuna", "crustaceans", "cow", "pork", "chicken", "dairy", "milk", "eggs", "honey"};
+            case "vegetarian":
+                return new String[]{"meat", "cow", "pork", "chicken", "fish", "tuna", "crustaceans"};
+            case "halal":
+                return new String[]{"pork", "alcohol", "wine"};
+            case "pescatarian":
+                return new String[]{"meat", "chicken", "pork"};
+            default:
+                return new String[0]; // Default to an empty array
+        }
     }
 
     

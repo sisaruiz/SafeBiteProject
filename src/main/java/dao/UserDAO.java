@@ -10,12 +10,14 @@ import com.mongodb.client.model.Filters;
 import model.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
+import org.neo4j.driver.exceptions.Neo4jException;
 
 
 
@@ -23,9 +25,9 @@ public class UserDAO {
     private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> usersCollection;
-    // Neo4j connection details
+
     private Neo4jManager neo4jManager;
- // Temporary storage for deleted users
+    // Temporary storage for deleted users
     private Map<String, User> deletedUsers = new HashMap<>();
 
 
@@ -36,14 +38,27 @@ public class UserDAO {
         neo4jManager = new Neo4jManager();
         
     }
+    
+    public Boolean verifyDummyUser(String user) {
+    	return neo4jManager.verifyDummyUser(user);
+    }
 
     public User getUserByUsername(String username) {
         Document userDocument = usersCollection.find(new Document("user_name", username)).first();
         if (userDocument != null) {
             Document allergyDocument = userDocument.get("allergy", Document.class);
             
-            List<String> allergens = (allergyDocument != null) ? allergyDocument.getList("allergens", String.class) : null;
-
+            List<String> allergens = null;
+            if (allergyDocument != null) {
+                Object allergensObject = allergyDocument.get("allergens");
+                if (allergensObject instanceof List<?>) {
+                    allergens = (List<String>) allergensObject;
+                } else if (allergensObject instanceof String) {
+                    // Handle the case where allergens is a single string, not a list
+                    allergens = Collections.singletonList((String) allergensObject);
+                }
+            }
+            
             User user = new User(username, userDocument.getString("email"), userDocument.getString("password"),
                     "https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
                     userDocument.getString("country"), userDocument.getString("date_of_birth"), userDocument.getString("gender"),
@@ -90,7 +105,7 @@ public class UserDAO {
     
     
     // CREATE USER
-    public void insertUser(Document newUser) {
+    public Boolean insertUser(Document newUser) {
         try {
             // MongoDB
         	usersCollection.insertOne(newUser);
@@ -102,8 +117,9 @@ public class UserDAO {
         } catch (MongoException mongoException) {
             // Handle MongoDB exception
             mongoException.printStackTrace();
-            throw new RuntimeException("Error creating User in MongoDB: " + mongoException.getMessage());
-
+            System.out.println("Error creating User in MongoDB: " + mongoException.getMessage());
+            return false;
+            
         } catch (Neo4jException neo4jException) {
             
             // Revert MongoDB operation (delete user)
@@ -113,14 +129,16 @@ public class UserDAO {
             
             // Handle Neo4j exception
             neo4jException.printStackTrace();
-            
-            throw new RuntimeException("Error creating User in Neo4j: " + neo4jException.getMessage());
+            System.out.println("Error creating User: " + neo4jException.getMessage());
+            return false;
 
         } catch (Exception e) {
             // Handle other exceptions
             e.printStackTrace();
-            throw new RuntimeException("Error creating User: " + e.getMessage());
+            System.out.println("Error creating User: " + e.getMessage());
+            return false;
         }
+        return true;
     }
     
     public boolean checkUsernameExists(String username) {
@@ -132,7 +150,7 @@ public class UserDAO {
 	
     // UPDATE USER
 
-	public void updateUserProfile(User user) {
+	public Boolean updateUserProfile(User user) {
     	
         try {
             // MongoDB
@@ -144,18 +162,23 @@ public class UserDAO {
             // Handle MongoDB exception
             e.printStackTrace();
             System.out.println("Error updating user profile in MongoDB: " + e.getMessage());
+            return false;
 
         } catch (Neo4jException e) {
             // Handle Neo4j exception
             e.printStackTrace();
             System.out.println("Error updating user profile in Neo4j: " + e.getMessage());
             revertMongoDBUserUpdate(user.getName(), getExistingUserData(user.getName()));
+            return false;
 
         } catch (Exception e) {
             // Handle other exceptions
             e.printStackTrace();
             System.out.println("Error updating user profile: " + e.getMessage());         
+            return false;
         }
+        
+        return true;
     }
     
     
@@ -196,40 +219,30 @@ public class UserDAO {
 	}
 	    
 	private void updateUserNeo4j(User user) {
-	    try {
-	        // Neo4j
-	        neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
-	        neo4jManager.deleteNeo4jUserAllergenRelationships(user.getName());
-	        neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
 
-	        if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
-	            for (String allergen : user.getListAllergens()) {
-	                neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
-	            }
+	    neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
+	    neo4jManager.deleteNeo4jUserAllergenRelationships(user.getName());
+	    neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
+
+	    if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
+	        for (String allergen : user.getListAllergens()) {
+	            neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
 	        }
-	    } catch (Exception e) {
-	        // Convert Neo4j exceptions to a specific Neo4jException (if needed)
-	        throw new Neo4jException("Error updating user profile in Neo4j: " + e.getMessage(), e);
 	    }
 	}    
-	
-	
-	// Add a Neo4jException class (if not already available)
-	public class Neo4jException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-
-		public Neo4jException(String message, Throwable cause) {
-	        super(message, cause);
-	    }
-	}
     
 	
 	// DELETE USER
 	
-    public void deleteUser(String username) {
+    public Boolean deleteUser(String username) {
     	try {
             // MongoDB
             Document query = new Document("user_name", username);
+            
+            // Store the user information before deleting
+            User deletedUserData = getExistingUserData(username);
+            deletedUsers.put(username, deletedUserData);
+            
     		// Delete the document from the MongoDB collection
             usersCollection.deleteOne(query);
             
@@ -240,18 +253,22 @@ public class UserDAO {
             // Handle MongoDB exception
             e.printStackTrace();
             System.out.println("Error deleting user profile in MongoDB: " + e.getMessage());
+            return false;
 
         } catch (Neo4jException e) {
             // Handle Neo4j exception
             e.printStackTrace();
             System.out.println("Error deleting user profile in Neo4j: " + e.getMessage());
             revertMongoDBUserDelete(username);
+            return false;
 
         } catch (Exception e) {
             // Handle other exceptions
             e.printStackTrace();
-            System.out.println("Error deleting user profile: " + e.getMessage());         
+            System.out.println("Error deleting user profile: " + e.getMessage());  
+            return false;
         }
+    	return true;
     }
     
     public void revertMongoDBUserDelete(String username) {
@@ -280,7 +297,7 @@ public class UserDAO {
         if (mongoClient != null) {
             mongoClient.close();
             neo4jManager.closeNeo4jConnection();
-            System.out.println("MongoDB connection closed successfully.");
+            System.out.println("DB connections closed successfully.");
         }
     }
 }

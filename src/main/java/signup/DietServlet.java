@@ -50,24 +50,19 @@ public class DietServlet extends HttpServlet {
 
 	    // Update related doc
 	    User updatedUser = new User(username, null, null, null, null, null, null, diet, allergies);
-	    try {
-	    	userdao.updateUserProfile(updatedUser);
+	    if (userdao.updateUserProfile(updatedUser)) {
+	    	// Redirect to success page
+		    response.sendRedirect("success.jsp");
 	    }
-	    catch(Exception e) {
+	    else {
 	    	
 	    	// Remove user node from both databases
 	    	userdao.deleteUser(username);
-	    	
-	    	e.printStackTrace();
-            System.out.println("Error setting up profile: " + e.getMessage());
             
             out.println("Sorry! There's a problem signing you up right now. Try later.");
 			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
 			rd.include(request, response);
 	    }
-	    
-	    // Redirect to success page
-	    response.sendRedirect("success.jsp");
 	    
 	    userdao.closeConnections();
 	}

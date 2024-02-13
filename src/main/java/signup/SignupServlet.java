@@ -37,40 +37,46 @@ public class SignupServlet extends HttpServlet {
 		
 		//Check if username already exists
         UserDAO userdao = new UserDAO();
-        if (userdao.checkUsernameExists(username)) {
+        if (userdao.checkUsernameExists(username) && !userdao.verifyDummyUser(username)) {
             // It exists
             out.println("Sorry! Username already exists. Please, choose a different one.");
             RequestDispatcher rd = request.getRequestDispatcher("signup.jsp");
             rd.include(request, response);
+            userdao.closeConnections();
             return; // Exit the method if username exists
         }
         
-        try {
-        	//Create document with new user data			
-            Document newUser = new Document("user_name", username)
+        if (userdao.verifyDummyUser(username)) {
+        	if (!userdao.deleteUser(username)) {
+        		out.println("Sorry! There's a problem signing you up right now. Try later.");
+    			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+    			rd.include(request, response);
+    			userdao.closeConnections();
+    			return;
+        	}
+        }
+        		
+        Document newUser = new Document("user_name", username)
                 		.append("email", email)
                 		.append("password", psw)
                 		.append("country", country)
                 		.append("date_of_birth", dateOfBirth)
                 		.append("gender", gender)
                 		.append("admin", false);
+                        		
+        if (userdao.insertUser(newUser)) {
+        	//Save name to associate subsequent diet setup
+            HttpSession hs = request.getSession();
+    		hs.setAttribute("uname", username);
                 
-            
-        		
-        	userdao.insertUser(newUser);
-        		
-        } catch (Exception e) {
+            //Redirect to profile setting page
+            response.sendRedirect("profile_setup.jsp");
+        }	
+        else {
         	out.println("Sorry! There's a problem signing you up right now. Try later.");
 			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
 			rd.include(request, response);
         }
-            
-        //Save name to associate subsequent diet setup
-        HttpSession hs = request.getSession();
-		hs.setAttribute("uname", username);
-            
-        //Redirect to profile setting page
-        response.sendRedirect("profile_setup.jsp");
         
         userdao.closeConnections();
   

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import dao.ProductDAO;
-import dao.Neo4jManager;
 
 
 /**
@@ -26,29 +25,24 @@ public class DeleteProductServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String productId = request.getParameter("productId");
+		// Redirect to the main page
+        PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
 
-		Neo4jManager neo4jManager = new Neo4jManager();
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(productId);
 
-        if (product != null) {
-            // Delete the product in mongodb
-            productDAO.deleteProduct(productId);
-            
-         // Delete the product in Neo4j
-            neo4jManager.deleteNeo4jProductNode(productId);
-
-            // Redirect to the main page
-            PrintWriter out = response.getWriter();
-    		response.setContentType("text/html");
+        if (productDAO.deleteProduct(product)) {
             out.println("Product deleted successfully.");
-			RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
-			rd.include(request, response);
-            
-        } else {
-            // Handle the case where the product is not found
-            response.sendRedirect("errorPage.jsp");
         }
+        else {
+        	out.println("Product deletion failed.");
+        }
+        
+        productDAO.closeConnections();
+        
+        RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
+		rd.include(request, response);
 	}
 
 }

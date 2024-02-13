@@ -2,8 +2,6 @@ package product;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import dao.ProductDAO;
-import dao.Neo4jManager;
 
 /**
  * Servlet implementation class UpdateProductServlet
@@ -50,38 +47,33 @@ public class UpdateProductServlet extends HttpServlet {
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(productId);
 
-        if (product != null) {
-            // Update the product attributes
-            product.setName(productName);
-            product.setQuantity(quantity);
-            product.setIngredients(ingredients);
-            product.setAllergens(allergens);
-            product.setTraces(traces);
-            product.setLabels(labels);
-            product.setCategories(categories);
-            product.setBrandOwner(brandOwner);
-            product.setBrand(brand);
-            product.setCountries(countries); 
-            product.setImgURL(imgURL);
-            product.setLUB(admin);
-            product.setLUTS(new Date());
+        // Update the product attributes
+        product.setName(productName);
+        product.setQuantity(quantity);
+        product.setIngredients(ingredients);
+        product.setAllergens(allergens);
+        product.setTraces(traces);
+        product.setLabels(labels);
+        product.setCategories(categories);
+        product.setBrandOwner(brandOwner);
+        product.setBrand(brand);
+        product.setCountries(countries); 
+        product.setImgURL(imgURL);
+        product.setLUB(admin);
+        product.setLUTS(new Date());
 
-            // Save the updated product
-            productDAO.updateProduct(product);
-            
-         // Update the product in Neo4j
-            Neo4jManager neo4jManager = new Neo4jManager();
-            neo4jManager.updateNeo4jProductNode(productId, productName);
-            
-
+        // Save the updated product
+        if (productDAO.updateProduct(product)) {
             // Redirect to the product details page
             out.println("Product updated successfully.");
-			RequestDispatcher rd = request.getRequestDispatcher("productEdit.jsp?productId=" + productId);
-			rd.include(request, response);
         } else {
             // Handle the case where the product is not found
-            response.sendRedirect("errorPage.jsp");
+        	out.println("Product update failed.");
         }
+        productDAO.closeConnections();
+        RequestDispatcher rd = request.getRequestDispatcher("productEdit.jsp?productId=" + productId);
+		rd.include(request, response);
+		
 	}
 
 }
