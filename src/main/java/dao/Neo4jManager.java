@@ -79,7 +79,7 @@ public class Neo4jManager {
         }
     }
     
-    public void deleteNeo4jUserNodes(String userName) {
+    public void deleteNeo4jUserNode(String userName) {
         try (Transaction transaction = neo4jSession.beginTransaction()) {
             transaction.run("MATCH (u:User {user_name: $user_name}) DETACH DELETE u",
                     parameters("user_name", userName));

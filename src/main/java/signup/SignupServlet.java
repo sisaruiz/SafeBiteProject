@@ -9,14 +9,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import org.bson.Document;
-
-import com.mongodb.client.*;
-
-import dao.Neo4jManager;
-
-import com.mongodb.ConnectionString;
+import dao.UserDAO;
 
 /**
  * Servlet implementation class SignupServlet
@@ -32,14 +26,6 @@ public class SignupServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		response.setContentType("text/html");
 		
-		//Create connection string
-		ConnectionString uri = new ConnectionString("mongodb://localhost:27017");
-		//Create a mongoDB client
-		MongoClient myClient = MongoClients.create(uri);
-		//Connect to database
-		MongoDatabase database = myClient.getDatabase("SafeBite");
-		//Select the collection test
-		MongoCollection<Document> usersCollection = database.getCollection("Users");
 		
 		//Get parameters
 		String username = request.getParameter("name");
@@ -50,39 +36,44 @@ public class SignupServlet extends HttpServlet {
 		String gender = request.getParameter("gender");
 		
 		//Check if username already exists
-        Document omonymous = usersCollection.find(new Document("user_name", username)).first();
-        if (omonymous != null) {
-            //It exists
-        	out.println("Sorry! Username already exists. Please, choose a different one.");
-			RequestDispatcher rd = request.getRequestDispatcher("signup.jsp");
+        UserDAO userdao = new UserDAO();
+        if (userdao.checkUsernameExists(username)) {
+            // It exists
+            out.println("Sorry! Username already exists. Please, choose a different one.");
+            RequestDispatcher rd = request.getRequestDispatcher("signup.jsp");
+            rd.include(request, response);
+            return; // Exit the method if username exists
+        }
+        
+        try {
+        	//Create document with new user data			
+            Document newUser = new Document("user_name", username)
+                		.append("email", email)
+                		.append("password", psw)
+                		.append("country", country)
+                		.append("date_of_birth", dateOfBirth)
+                		.append("gender", gender)
+                		.append("admin", false);
+                
+            
+        		
+        	userdao.insertUser(newUser);
+        		
+        } catch (Exception e) {
+        	out.println("Sorry! There's a problem signing you up right now. Try later.");
+			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
 			rd.include(request, response);
         }
-        else {
-            //Create document with new user data			
-            Document newUser = new Document("user_name", username)
-            		.append("email", email)
-            		.append("password", psw)
-            		.append("country", country)
-            		.append("date_of_birth", dateOfBirth)
-            		.append("gender", gender)
-            		.append("admin", false);
-
-    		//Insert new user into MongoDB users dataset
-            usersCollection.insertOne(newUser);
             
-            //Insert new user into Neo4j users dataset
-            Neo4jManager neo4jManager = new Neo4jManager();
-            neo4jManager.createNeo4jUserNode(username);
+        //Save name to associate subsequent diet setup
+        HttpSession hs = request.getSession();
+		hs.setAttribute("uname", username);
             
-            //Save name to associate subsequent diet setup
-        	HttpSession hs = request.getSession();
-			hs.setAttribute("uname", username);
-            
-            //Redirect to profile setting page
-            response.sendRedirect("profile_setup.jsp");
-        }
+        //Redirect to profile setting page
+        response.sendRedirect("profile_setup.jsp");
+        
+        userdao.closeConnections();
   
-		myClient.close();
 	}
 
 }

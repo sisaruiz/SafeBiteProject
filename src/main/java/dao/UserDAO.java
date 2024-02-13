@@ -5,15 +5,17 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
-import org.neo4j.driver.exceptions.Neo4jException;
 
 
 
@@ -23,6 +25,8 @@ public class UserDAO {
     private MongoCollection<Document> usersCollection;
     // Neo4j connection details
     private Neo4jManager neo4jManager;
+ // Temporary storage for deleted users
+    private Map<String, User> deletedUsers = new HashMap<>();
 
 
     public UserDAO() {
@@ -43,7 +47,7 @@ public class UserDAO {
             User user = new User(username, userDocument.getString("email"), userDocument.getString("password"),
                     "https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
                     userDocument.getString("country"), userDocument.getString("date_of_birth"), userDocument.getString("gender"),
-                    userDocument.getString("diet_type"), userDocument.getList("friends", String.class),
+                    userDocument.getString("diet_type"),
                     allergens);
 
             return user;
@@ -85,14 +89,56 @@ public class UserDAO {
     }
     
     
+    // CREATE USER
+    public void insertUser(Document newUser) {
+        try {
+            // MongoDB
+        	usersCollection.insertOne(newUser);
+
+            // Neo4j
+            Neo4jManager neo4jManager = new Neo4jManager();
+            neo4jManager.createNeo4jUserNode(newUser.getString("user_name"));
+
+        } catch (MongoException mongoException) {
+            // Handle MongoDB exception
+            mongoException.printStackTrace();
+            throw new RuntimeException("Error creating User in MongoDB: " + mongoException.getMessage());
+
+        } catch (Neo4jException neo4jException) {
+            
+            // Revert MongoDB operation (delete user)
+            Document query = new Document("user_name", newUser.getString("user_name"));
+    		// Delete the document from the MongoDB collection
+            usersCollection.deleteOne(query);
+            
+            // Handle Neo4j exception
+            neo4jException.printStackTrace();
+            
+            throw new RuntimeException("Error creating User in Neo4j: " + neo4jException.getMessage());
+
+        } catch (Exception e) {
+            // Handle other exceptions
+            e.printStackTrace();
+            throw new RuntimeException("Error creating User: " + e.getMessage());
+        }
+    }
     
-    public void updateUserProfile(User user) {
+    public boolean checkUsernameExists(String username) {
+        // Check if username already exists in MongoDB collection
+        Document existingUser = usersCollection.find(Filters.eq("user_name", username)).first();
+        return existingUser != null;
+    }
+    
+	
+    // UPDATE USER
+
+	public void updateUserProfile(User user) {
     	
         try {
             // MongoDB
-            updateMongoDB(user);
+            updateUserMongoDB(user);
             // Neo4j
-            updateNeo4j(user);
+            updateUserNeo4j(user);
 
         } catch (MongoException e) {
             // Handle MongoDB exception
@@ -103,7 +149,7 @@ public class UserDAO {
             // Handle Neo4j exception
             e.printStackTrace();
             System.out.println("Error updating user profile in Neo4j: " + e.getMessage());
-            revertMongoDBUpdate(user.getName(), getExistingUserData(user.getName()));
+            revertMongoDBUserUpdate(user.getName(), getExistingUserData(user.getName()));
 
         } catch (Exception e) {
             // Handle other exceptions
@@ -124,12 +170,12 @@ public class UserDAO {
                     "https://i.ibb.co/0MCmLLM/360-F-353110097-nbpmfn9i-Hlxef4-EDIh-XB1td-TD0lc-Wh-G9.jpg",
                     userDocument.getString("country"), userDocument.getString("date_of_birth"),
                     userDocument.getString("gender"), userDocument.getString("diet_type"),
-                    userDocument.getList("friends", String.class), allergens);
+                    allergens);
         }
         return null;
     }
     
-    public void revertMongoDBUpdate(String username, User existingUserData) {
+    public void revertMongoDBUserUpdate(String username, User existingUserData) {
         if (existingUserData != null) {
             // Create an update document with the existing user information
             Document update = new Document("$set", new Document()
@@ -141,7 +187,7 @@ public class UserDAO {
         }
     }
 	
-	private void updateMongoDB(User user) {
+	private void updateUserMongoDB(User user) {
 		Document query = new Document("user_name", user.getName());
 	    Document update = new Document("$set", new Document()
 	                .append("diet_type", user.getDiet())
@@ -149,7 +195,7 @@ public class UserDAO {
 	        usersCollection.updateOne(query, update);
 	}
 	    
-	private void updateNeo4j(User user) {
+	private void updateUserNeo4j(User user) {
 	    try {
 	        // Neo4j
 	        neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
@@ -177,47 +223,64 @@ public class UserDAO {
 	    }
 	}
     
-    /*
-    public void updateUserProfile(User user) {
-    	
-    	// MongoDB
-    	
-        // Assuming 'user_name' is the unique identifier in your MongoDB collection
-        Document query = new Document("user_name", user.getName());
+	
+	// DELETE USER
+	
+    public void deleteUser(String username) {
+    	try {
+            // MongoDB
+            Document query = new Document("user_name", username);
+    		// Delete the document from the MongoDB collection
+            usersCollection.deleteOne(query);
+            
+            // Neo4j
+            neo4jManager.deleteNeo4jUserNode(username);
 
-        // Create an update document with the modified user information
-        Document update = new Document("$set", new Document()
-                .append("diet_type", user.getDiet())
-                .append("allergy", new Document("allergens", user.getListAllergens())));
+        } catch (MongoException e) {
+            // Handle MongoDB exception
+            e.printStackTrace();
+            System.out.println("Error deleting user profile in MongoDB: " + e.getMessage());
 
-        // Update the document in the MongoDB collection
-        usersCollection.updateOne(query, update);
-        
-        
-        // Neo4j
-        
-        neo4jManager.deleteNeo4jUserDietRelationship(user.getName());
-        neo4jManager.deleteNeo4jUserAllergenRelationships(user.getName());
-        
-        neo4jManager.createNeo4jUserDietRelationship(user.getName(), user.getDiet());
-        
-        if (user.getListAllergens() != null && !user.getListAllergens().isEmpty()) {
-            for (String allergen : user.getListAllergens()) {
-                neo4jManager.createNeo4jUserAllergyRelationship(user.getName(), allergen);
-            }
+        } catch (Neo4jException e) {
+            // Handle Neo4j exception
+            e.printStackTrace();
+            System.out.println("Error deleting user profile in Neo4j: " + e.getMessage());
+            revertMongoDBUserDelete(username);
+
+        } catch (Exception e) {
+            // Handle other exceptions
+            e.printStackTrace();
+            System.out.println("Error deleting user profile: " + e.getMessage());         
         }
     }
-    */
-
-    public void deleteUser(String username) {
-        // Assuming 'user_name' is the unique identifier in your MongoDB collection
-        Document query = new Document("user_name", username);
-
-        // Delete the document from the MongoDB collection
-        usersCollection.deleteOne(query);
-        
-        // Delete Neo4j nodes related to the user
-        neo4jManager.deleteNeo4jUserNodes(username);
-
+    
+    public void revertMongoDBUserDelete(String username) {
+        if (deletedUsers.containsKey(username)) {
+            User deletedUserData = deletedUsers.get(username);
+            // Insert the deleted user data back into the MongoDB collection
+            usersCollection.insertOne(createUserDocument(deletedUserData));
+            // Remove the user from the temporary storage
+            deletedUsers.remove(username);
+        }
+    }
+    
+    // Helper method to convert User object to MongoDB Document
+    private Document createUserDocument(User user) {
+        return new Document("user_name", user.getName())
+                .append("email", user.getEmail())
+                .append("password", user.getPassword())
+                .append("country", user.getCountry())
+                .append("date_of_birth", user.getDOB())
+                .append("gender", user.getGender())
+                .append("diet_type", user.getDiet())
+                .append("allergy", new Document("allergens", user.getListAllergens()));
+    }
+    
+    public void closeConnections() {
+        if (mongoClient != null) {
+            mongoClient.close();
+            neo4jManager.closeNeo4jConnection();
+            System.out.println("MongoDB connection closed successfully.");
+        }
     }
 }

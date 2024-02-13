@@ -1,25 +1,20 @@
 package signup;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.User;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bson.Document;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-import dao.Neo4jManager;
+import dao.UserDAO;
 
 /**
  * Servlet implementation class DietServlet
@@ -32,15 +27,9 @@ public class DietServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    
-	    //Create connection string
-	    ConnectionString uri = new ConnectionString("mongodb://localhost:27017");
-	    //Create a mongoDB client
-	    MongoClient myClient = MongoClients.create(uri);
-
-	    //Connect to database
-	    MongoDatabase database = myClient.getDatabase("SafeBite");
-	    //Select the collection test
-	    MongoCollection<Document> usersCollection = database.getCollection("Users");
+		PrintWriter out = response.getWriter();
+		response.setContentType("text/html");
+		UserDAO userdao = new UserDAO();
 	    
 	    //Get parameter values
 	    HttpSession session = request.getSession(false);
@@ -59,23 +48,28 @@ public class DietServlet extends HttpServlet {
 	        allergies = new ArrayList<>();
 	    }
 
-	    // Update related doc in MongoDB
-	    usersCollection.updateOne(new Document("user_name", username), new Document("$set",
-	        new Document("diet_type", diet)
-	            .append("allergy", new Document("allergens", allergies))));
-
-	    Neo4jManager neo4jManager = new Neo4jManager();
-	    for (String allergen : allergies) {
-	    	System.out.println(allergen);
-    	    neo4jManager.createNeo4jUserAllergyRelationship(username, allergen);
-    	}
-	    neo4jManager.createNeo4jUserDietRelationship(username, diet);
-	    neo4jManager.closeNeo4jConnection();
+	    // Update related doc
+	    User updatedUser = new User(username, null, null, null, null, null, null, diet, allergies);
+	    try {
+	    	userdao.updateUserProfile(updatedUser);
+	    }
+	    catch(Exception e) {
+	    	
+	    	// Remove user node from both databases
+	    	userdao.deleteUser(username);
+	    	
+	    	e.printStackTrace();
+            System.out.println("Error setting up profile: " + e.getMessage());
+            
+            out.println("Sorry! There's a problem signing you up right now. Try later.");
+			RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+			rd.include(request, response);
+	    }
 	    
 	    // Redirect to success page
 	    response.sendRedirect("success.jsp");
 	    
-	    myClient.close();
+	    userdao.closeConnections();
 	}
 
 }
