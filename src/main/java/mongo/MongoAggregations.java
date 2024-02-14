@@ -10,10 +10,7 @@ import org.bson.Document;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Projections;
@@ -28,22 +25,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dao.ProductDAO;
+import dao.ReviewDAO;
+import dao.UserDAO;
+
 public class MongoAggregations {
 
-    private MongoClient mongoClient;
-    private MongoDatabase database;
-    private MongoCollection<Document> collection;
+	private ProductDAO productDAO;
+	private ReviewDAO reviewDAO;
+	private UserDAO userDAO;
+	
 
-    public MongoAggregations(String connectionString, String databaseName, String collectionName) {
-        this.mongoClient = MongoClients.create(connectionString);
-        this.database = mongoClient.getDatabase(databaseName);
-        this.collection = database.getCollection(collectionName);
+    public MongoAggregations() {
+    	
+    	productDAO = new ProductDAO();
+    	reviewDAO = new ReviewDAO();
+    	userDAO = new UserDAO();
     }
 
     //Retrieves the aggregate result for the count of products in each category.
     public AggregateIterable<Document> getProductCategoryCounts() {
         // Perform aggregation using the MongoDB Java driver
-        return collection.aggregate(Arrays.asList(
+        return productDAO.productsCollection.aggregate(Arrays.asList(
                 // Group products by the 'main_category' field and calculate the count of each group
                 group("$main_category", sum("count", 1)),
 
@@ -76,7 +79,7 @@ public class MongoAggregations {
         
         List<Bson> pipeline = Arrays.asList(matchStage, groupStage, projectStage, sortStage, limitStage);
         
-        List<Document> results = collection.aggregate(pipeline).into(new ArrayList<>());
+        List<Document> results = productDAO.productsCollection.aggregate(pipeline).into(new ArrayList<>());
         
         // Print the results for debugging
         System.out.println("Aggregation Results: " + results);
@@ -84,9 +87,9 @@ public class MongoAggregations {
         return results;
     }
 
+    // STATIC IN RETURN
     
-    
-    public static List<Document> getMostReviewedProducts(MongoCollection<Document> reviewsCollection, int limit) {
+    public List<Document> getMostReviewedProducts(int limit) {
         // Aggregation pipeline
         List<Document> pipeline = Arrays.asList(
             new Document("$group", new Document("_id",
@@ -101,7 +104,7 @@ public class MongoAggregations {
         );
 
         // Execute the aggregation pipeline
-        AggregateIterable<Document> aggregationResult = reviewsCollection.aggregate(pipeline);
+        AggregateIterable<Document> aggregationResult = reviewDAO.reviewCollection.aggregate(pipeline);
 
         // Convert the result to a list of documents
         List<Document> mostReviewedProducts = new ArrayList<>();
@@ -128,7 +131,7 @@ public class MongoAggregations {
         );
 
         // Execute the aggregation pipeline
-        AggregateIterable<Document> aggregationResult = collection.aggregate(pipeline);
+        AggregateIterable<Document> aggregationResult = reviewDAO.reviewCollection.aggregate(pipeline);
 
         // Convert the result to a list of documents
         List<Document> topReviewersAndAverageRating = new ArrayList<>();
@@ -163,7 +166,7 @@ public class MongoAggregations {
                                                         Arrays.asList("$$gc.count", "$totalUsers")),
                                                         100)))))));
 
-        return collection.aggregate(Arrays.asList(
+        return userDAO.usersCollection.aggregate(Arrays.asList(
                 groupByGenderAndDietType,
                 groupByDietType,
                 projectResult
@@ -210,7 +213,7 @@ public class MongoAggregations {
             System.out.println("Stage: " + stage.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()));
         }
 
-        collection.aggregate(pipeline).into(userRatingDistribution);
+        reviewDAO.reviewCollection.aggregate(pipeline).into(userRatingDistribution);
         
         // Print the components of the returned list
         for (Document document : userRatingDistribution) {
@@ -223,17 +226,12 @@ public class MongoAggregations {
         }
 
         return userRatingDistribution;
-    }
-    
-    
-    public MongoCollection<Document> getCollection() {
-        return this.collection;
-    }
+    }    
 
 
     public void closeConnection() {
-        if (mongoClient != null) {
-            mongoClient.close();
-        }
+        userDAO.closeConnections();
+        productDAO.closeConnections();
+        reviewDAO.closeConnection();
     }
 }

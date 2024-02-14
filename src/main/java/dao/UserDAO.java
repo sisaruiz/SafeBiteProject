@@ -24,7 +24,7 @@ import org.neo4j.driver.exceptions.Neo4jException;
 public class UserDAO {
     private MongoClient mongoClient;
     private MongoDatabase database;
-    private MongoCollection<Document> usersCollection;
+    public MongoCollection<Document> usersCollection;
 
     private Neo4jManager neo4jManager;
     // Temporary storage for deleted users
@@ -32,7 +32,8 @@ public class UserDAO {
 
 
     public UserDAO() {
-        mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
+        mongoClient = MongoClients.create("mongodb://10.1.1.20:27017,10.1.1.21:27017,10.1.1.22:27017/" 
+        									+ "?w=1&readPreferences=nearest&timeout=5000");
         database = mongoClient.getDatabase("SafeBite");
         usersCollection = database.getCollection("Users");       
         neo4jManager = new Neo4jManager();

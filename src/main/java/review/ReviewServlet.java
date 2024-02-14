@@ -1,5 +1,6 @@
 package review;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,15 +9,13 @@ import jakarta.servlet.http.HttpSession;
 import model.Review;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
+import dao.ReviewDAO;
 
 /**
  * Servlet implementation class ReviewServlet
@@ -53,37 +52,28 @@ public class ReviewServlet extends HttpServlet {
 	            // Create a Review object (assuming you have a Review class)
 	            Review review = new Review(username, productName, new ObjectId(productId), text, formattedDate, heading, rating);
 
+	            ReviewDAO reviewDAO = new ReviewDAO();
 	            // Save the review to MongoDB
-	            saveReviewToMongoDB(review);
-
+	            reviewDAO.saveReviewToMongoDB(review);
+	            
+	            
 	            // Redirect back to the product details page after inserting the review
 	            response.sendRedirect("productDetails.jsp?productId=" + productId);
 	        } catch (Exception e) {
-	            // Handle exceptions appropriately (e.g., log the error, show an error page)
+	            // Handle exceptions appropriately (e.g., log the error, show an error page)        	
 	            e.printStackTrace();
-	            response.sendRedirect("error.jsp"); // Redirect to an error page
+	        	PrintWriter out = response.getWriter();
+	    		response.setContentType("text/html");
+	    		
+	    		
+	        	out.println("Review insertion failed.");
+
+	            RequestDispatcher rd = request.getRequestDispatcher("productDetails.jsp?productId=" + request.getParameter("productId"));
+	            rd.include(request, response);
 	        }
 	}
 	
-	private void saveReviewToMongoDB(Review review) {
-		
-        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
-            // Get or create a collection for reviews
-            MongoCollection<Document> collection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
-
-            // Create a document from the Review object
-            Document reviewDocument = new Document("Review Rating", review.getReviewRating())
-                    .append("Review Heading", review.getReviewHeading())
-                    .append("Review Text", review.getReviewText())
-                    .append("Review Date", review.getReviewDate())
-                    .append("Product Name", review.getProductName())
-                    .append("User", review.getUsername())
-                    .append("Product ID", review.getProductID());                    ;
-
-            // Insert the document into the MongoDB collection
-            collection.insertOne(reviewDocument);
-        }
-    }
+	
 	
 	
 

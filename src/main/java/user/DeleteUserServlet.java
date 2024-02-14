@@ -35,6 +35,7 @@ public class DeleteUserServlet extends HttpServlet {
         else {
         	out.println("User deletion failed.");
         }
+        userDAO.closeConnections();
         RequestDispatcher rd = request.getRequestDispatcher("adminHome.jsp");
 		rd.include(request, response);
         

@@ -41,23 +41,15 @@ String formatPercentage(double percentage) {
 <body>
 
 <%
-    String connectionString = "mongodb://localhost:27017";
-    String databaseName = "SafeBite";
-    String productsCollectionName = "Products";
-    String reviewsCollectionName = "Reviews";
-    String usersCollectionName = "Users";
 
-    MongoAggregations productsAggregations = new MongoAggregations(connectionString, databaseName, productsCollectionName);
-    MongoAggregations reviewsAggregations = new MongoAggregations(connectionString, databaseName, reviewsCollectionName);
-    MongoAggregations usersAggregations = new MongoAggregations(connectionString, databaseName, usersCollectionName);
-    
+    MongoAggregations mongo = new MongoAggregations();    
 
-    AggregateIterable<Document> productCategoryCounts = productsAggregations.getProductCategoryCounts();
-    List<Document> productCountByBrandAndCountry = productsAggregations.getProductCountByBrandAndCountry();
-    List<Document> mostReviewedProducts = reviewsAggregations.getMostReviewedProducts(reviewsAggregations.getCollection(), 10);
-    List<Document> topReviewersAndAverageRating = reviewsAggregations.getTopReviewersAndAverageRating(10);
+    AggregateIterable<Document> productCategoryCounts = mongo.getProductCategoryCounts();
+    List<Document> productCountByBrandAndCountry = mongo.getProductCountByBrandAndCountry();
+    List<Document> mostReviewedProducts = mongo.getMostReviewedProducts(10);
+    List<Document> topReviewersAndAverageRating = mongo.getTopReviewersAndAverageRating(10);
 
-    AggregateIterable<Document> genderPercentageByDietType = usersAggregations.calculateGenderPercentageByDietType();
+    AggregateIterable<Document> genderPercentageByDietType = mongo.calculateGenderPercentageByDietType();
 
 %>
 
@@ -167,9 +159,7 @@ String formatPercentage(double percentage) {
 
 <%
     // Close the MongoDB connections after using the results
-    productsAggregations.closeConnection();
-    reviewsAggregations.closeConnection();
-    usersAggregations.closeConnection();
+    mongo.closeConnection();
     
 %>
 </body>

@@ -23,11 +23,12 @@ import java.util.Map;
 
 public class ReviewDAO {
     private final MongoClient mongoClient;
-    private final MongoCollection<Document> reviewCollection;
+    public final MongoCollection<Document> reviewCollection;
 
     public ReviewDAO() {
         // Set up MongoDB connection and get the review collection
-        this.mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
+        this.mongoClient = MongoClients.create("mongodb://10.1.1.20:27017,10.1.1.21:27017,10.1.1.22:27017/" +
+        										"?w=1&readPreferences=nearest&timeout=5000");
         this.reviewCollection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
     }
     
@@ -126,6 +127,28 @@ public class ReviewDAO {
         } catch (Exception e) {
             // Handle exceptions appropriately (e.g., log the error, throw an exception)
             e.printStackTrace();
+        }
+    }
+    
+    public void saveReviewToMongoDB(Review review) {
+		
+            // Create a document from the Review object
+            Document reviewDocument = new Document("Review Rating", review.getReviewRating())
+                    .append("Review Heading", review.getReviewHeading())
+                    .append("Review Text", review.getReviewText())
+                    .append("Review Date", review.getReviewDate())
+                    .append("Product Name", review.getProductName())
+                    .append("User", review.getUsername())
+                    .append("Product ID", review.getProductID());                    ;
+
+            // Insert the document into the MongoDB collection
+            reviewCollection.insertOne(reviewDocument);
+    }
+    
+    public void closeConnection() {
+        if (mongoClient != null) {
+            mongoClient.close();
+            System.out.println("Mongo connection closed successfully.");
         }
     }
 }

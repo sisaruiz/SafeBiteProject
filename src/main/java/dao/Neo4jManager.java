@@ -23,7 +23,7 @@ public class Neo4jManager {
 
     
     public Neo4jManager() {
-        neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4jneo"));
+        neo4jDriver = GraphDatabase.driver("bolt://10.1.1.20:7687", AuthTokens.basic("neo4j", "neo4jneo"));
         neo4jSession = neo4jDriver.session();
     }
     

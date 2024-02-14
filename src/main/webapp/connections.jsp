@@ -2,7 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="model.User" %>
-<%@ page import="dao.UserDAO" %>
 <%@ page import="dao.Neo4jManager" %>
 
 <%

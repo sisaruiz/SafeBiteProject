@@ -33,6 +33,7 @@ public class DeleteReviewServlet extends HttpServlet {
 
             // Redirect to the product edit page or any other appropriate page
             response.sendRedirect("productEdit.jsp?productId=" + productId);
+            reviewDAO.closeConnection();
         } else {
             // Handle the case where reviewId is null or empty
             response.getWriter().println("Invalid review ID");

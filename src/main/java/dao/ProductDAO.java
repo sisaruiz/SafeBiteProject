@@ -23,12 +23,13 @@ public class ProductDAO {
 	
 	private MongoClient mongoClient;
     private MongoDatabase database;
-    private MongoCollection<Document> productsCollection;
+    public MongoCollection<Document> productsCollection;
     private Neo4jManager neo4jManager;
     private Map<String, Product> deletedProducts = new HashMap<>();
 
     public ProductDAO() {
-        mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
+        mongoClient = MongoClients.create("mongodb://10.1.1.20:27017,10.1.1.21:27017,10.1.1.22:27017/" + 
+        								"?w=1&readPreferences=nearest&timeout=5000");
         database = mongoClient.getDatabase("SafeBite");
         productsCollection = database.getCollection("Products");
         neo4jManager = new Neo4jManager();

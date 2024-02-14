@@ -50,5 +50,7 @@ public class UpdateProfileServlet extends HttpServlet {
             // Handle the case where the user is not found
             response.getWriter().println("User not found");
         }
+        
+        userDAO.closeConnections();
     }
 }

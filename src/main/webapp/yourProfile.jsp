@@ -25,16 +25,14 @@
 
 
 	<%
-		String mongoConString = "mongodb://localhost:27017/";
-		String mongoDB = "SafeBite";
-		String mongoCol = "Reviews";
-		MongoAggregations userAggregations = new MongoAggregations(mongoConString, mongoDB, mongoCol);
+		
+		MongoAggregations mongoAggregations = new MongoAggregations();
 	    String username = (String) session.getAttribute("uname");
 	    UserDAO userDAO = new UserDAO();
 	    User user = userDAO.getUserByUsername(username);
 	    ReviewDAO reviewDAO = new ReviewDAO();
 	    Object reviewsObject = reviewDAO.getLastThreeReviewsWithDates(username);
-	    List<Document> userRatingDistribution = userAggregations.getUserRatingDistributionOverTime(username);
+	    List<Document> userRatingDistribution = mongoAggregations.getUserRatingDistributionOverTime(username);
     %>
     <h1>Your profile</h1>
     <img class="user-img" src=<%= user.getPic() %>>
