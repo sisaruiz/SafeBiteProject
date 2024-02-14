@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="dao.ProductDAO" %>
 <%@ page import="model.Product" %>
 <!DOCTYPE html>
 <html>
@@ -25,81 +24,35 @@
         .product-container {
             text-align: center;
         }
-
-        /* Style for active pagination link */
-        .active-page {
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
     <h1>Search Results</h1>
     <% 
-    	String searchTerm = (String) request.getAttribute("searchTerm");
-        ProductDAO productDAO = new ProductDAO();
-        List<Product> allProducts = productDAO.searchProducts(request.getParameter("searchTerm"));
-        int numberOfResults = allProducts.size();
-        int resultsPerPage = 100; // Set the number of results per page
-
-        // Calculate the total number of pages
-        int totalPages = (int) Math.ceil((double) numberOfResults / resultsPerPage);
-
-        // Get the current page from the request, default to 1 if not present or invalid
-        int currentPage;
-        try {
-            currentPage = Integer.parseInt(request.getParameter("page"));
-            if (currentPage < 1 || currentPage > totalPages) {
-                currentPage = 1; // Invalid page, default to 1
-            }
-        } catch (NumberFormatException e) {
-            currentPage = 1; // Default to 1 if page parameter is not a valid integer
-        }
-
-        // Calculate the starting and ending indexes for the current page
-        int startIndex = (currentPage - 1) * resultsPerPage;
-        int endIndex = Math.min(startIndex + resultsPerPage, numberOfResults);
+        String searchTerm = (String) request.getAttribute("searchTerm");
+        // Retrieve the search results from the request attribute
+        List<Product> allProducts = (List<Product>) request.getAttribute("allProducts");
     %>
 
-    <p>Number of results: <%= numberOfResults %></p>
+    <p>Number of results: <%= allProducts.size() %></p>
 
     <div class="product-grid">
         <% 
-            if (numberOfResults > 0) {
-                for (int i = startIndex; i < endIndex; i++) {
-                    Product product = allProducts.get(i);
+            if (allProducts.size() > 0) {
+                for (Product product : allProducts) {
         %>
             <div class="product-container">
-    			<img class="product-image" src="<%= product.getImgURL() %>">
-    				<p>
-    				<%
-	    				if((Boolean)session.getAttribute("admin")==false){ %>
-	    					<a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
-    				<%  }
-	    				else{ %>
-    						<a href="productEdit.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
-    				<%
-    					}
-    				%>
-    				</p>
-			</div>
-        	<%
-            	}
+                <img class="product-image" src="<%= product.getImgURL() %>">
+                <p>
+                    <a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+                </p>
+            </div>
+            <%
+                }
             }
             else {
         %>
             <p>No products found matching your search term.</p>
-        <%
-            }
-        %>
-    </div>
-
-    <!-- Pagination links -->
-    <div>
-        <p>Page <%= currentPage %> of <%= totalPages %></p>
-        <%
-            for (int i = 1; i <= totalPages; i++) {
-        %>
-            <a href="searchResults.jsp?page=<%= i %>&searchTerm=<%= request.getParameter("searchTerm") %>" class="<%= (i == currentPage) ? "active-page" : "" %>"><%= i %></a>
         <%
             }
         %>
