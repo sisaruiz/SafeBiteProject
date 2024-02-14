@@ -4,7 +4,7 @@ SafeBite is a specialized web application designed to facilitate the discovery o
 
 Project for: 
 
-##Large-scale and Multi-structured Databases course (AIDE @ UNIPI)
+## Large-scale and Multi-structured Databases course (AIDE @ UNIPI)
 
 
 ### Tools Used
