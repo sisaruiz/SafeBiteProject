@@ -38,4 +38,4 @@ g. ~display results of those queries~
 
 h. make it beautiful
 
-i. upload dataset onto virtual machines and make it work
+i. ~upload dataset onto virtual machines and make it work~
