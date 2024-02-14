@@ -1,8 +1,11 @@
 # SafeBite 
 
-Project for: **Large-scale and Multi-structured Databases course (AIDE @ UNIPI)**
-
 SafeBite is a specialized web application designed to facilitate the discovery of gluten-free products based on individual dietary restrictions
+
+Project for: 
+
+##Large-scale and Multi-structured Databases course (AIDE @ UNIPI)
+
 
 ### Tools Used
 
