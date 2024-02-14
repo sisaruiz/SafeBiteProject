@@ -6,15 +6,15 @@ SafeBite is a specialized web application designed to facilitate the discovery o
 
 ### Tools Used
 
-- **Programming Language:**
-  - Java 
+- **Programming Languages:**
+  - Java
+  - Python
 
 - **Web Framework:**
   - Servlet
 
 - **Databases:**
   - MongoDB
-
   - Neo4J
 
 
