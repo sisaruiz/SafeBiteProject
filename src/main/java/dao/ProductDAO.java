@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.neo4j.driver.exceptions.Neo4jException;
 
 import com.mongodb.MongoException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -21,6 +22,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class ProductDAO {
 	
+	private static final int MINIMUM_SEARCH_TERM_LENGTH = 3;
 	private MongoClient mongoClient;
     private MongoDatabase database;
     public MongoCollection<Document> productsCollection;
@@ -41,21 +43,44 @@ public class ProductDAO {
         // Ensure productsCollection is not null
         if (productsCollection != null) {
             try {
-                // Query the 'Products' collection for matching documents
-                Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
-                Document query = new Document("product_name", pattern);
-                System.out.println("Constructed MongoDB Query: " + query.toJson());
+                // Capture the start time
+                long startTime = System.currentTimeMillis();
 
-                for (Document productDoc : productsCollection.find(query)) {
-                    // Extract fields from the Document
-                    String productId = productDoc.getObjectId("_id").toString();
-                    String productName = productDoc.getString("product_name");
-                    String imageUrl = productDoc.getString("image_url");
+                // Check if searchTerm is not null and has a reasonable length
+                if (searchTerm != null && searchTerm.length() >= MINIMUM_SEARCH_TERM_LENGTH) {
+                    // Construct the MongoDB Text Search Query
+                    Document textSearchQuery = new Document("$text", new Document("$search", searchTerm));
 
-                    // Create a Product instance
-                    Product product = new Product(productId, productName, imageUrl);
-                    products.add(product);
+                    // Use explain to analyze the query execution plan
+                    Document queryExplain = productsCollection.find(textSearchQuery).explain();
+                    System.out.println("Query Execution Plan: " + queryExplain.toJson());
+
+                    // Define the fields to include in the projection
+                    Document projection = new Document("product_name", 1)
+                                           .append("image_url", 1);
+
+                    // Iterate through the results
+                    for (Document productDoc : productsCollection.find(textSearchQuery).projection(projection)) {
+                        // Extract fields from the Document
+                        String productId = productDoc.getObjectId("_id").toString();
+                        String productName = productDoc.getString("product_name");
+                        String imageUrl = productDoc.getString("image_url");
+
+                        // Create a Product instance
+                        Product product = new Product(productId, productName, imageUrl);
+                        products.add(product);
+                    }
+
+                    // Capture the end time
+                    long endTime = System.currentTimeMillis();
+
+                    // Calculate and print the time taken
+                    long totalTime = endTime - startTime;
+                    System.out.println("MongoDB query took " + totalTime + " milliseconds.");
+                } else {
+                    System.out.println("Invalid search term. Check the length and try again.");
                 }
+
             } catch (Exception e) {
                 System.out.println("Error executing search query:");
                 e.printStackTrace();
@@ -66,6 +91,8 @@ public class ProductDAO {
 
         return products;
     }
+
+
     
     // Add a method to retrieve a product by its ID
     public Product getProductById(String productId) {
