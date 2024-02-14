@@ -34,8 +34,14 @@ Welcome, <%=session.getAttribute("uname")%>
     <input type="submit" value="Logout">
 </form>
 <br>
-<a href="browseProducts.jsp">Search products</a>
-<a href="browseUsers.jsp">Search users</a>
+<section>
+    <form action="SearchServlet" method="POST">
+        <label for="searchTerm">Search Product:</label>
+        <input type="text" id="searchTerm" name="searchTerm" required>
+        <br>
+        <input type="submit" value="Search">
+    </form>
+</section>
 <section>
     <h3>Explore recommended products ...</h3>
     <% if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
@@ -50,7 +56,15 @@ Welcome, <%=session.getAttribute("uname")%>
            <p>No recommended products found. Try updating your preferences.</p>
     <% } %>
 </section>
-
+<br>
+<section>
+    <form action="SearchUsersServlet" method="POST">
+        <label for="searchTerm">Search User:</label>
+        <input type="text" id="searchTerm" name="searchTerm" required>
+        <br>
+        <input type="submit" value="Search">
+    </form>
+</section>
 <section>
     <h3>Explore potential connections ...</h3>
     <% if (potentialFriends != null) {
