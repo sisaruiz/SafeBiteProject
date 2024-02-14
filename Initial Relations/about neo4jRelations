@@ -1,1 +1,3 @@
+In this folder you will find how we created the initial relations between our existing nodes in neo4j using python.
+This was the initial step for creating the relations between our nodes in neo4j after that everthing is done automatically from our java app.
 
