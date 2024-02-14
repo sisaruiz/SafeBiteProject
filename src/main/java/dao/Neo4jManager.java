@@ -26,14 +26,12 @@ public class Neo4jManager {
         neo4jDriver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4jneo"));
         neo4jSession = neo4jDriver.session();
     }
-
     
     public void createNeo4jUserNode(String userName) {
         Transaction transaction = neo4jSession.beginTransaction();
         transaction.run("CREATE (:User {user_name: $user_name})", parameters("user_name", userName));
         transaction.commit();
     }
-
 
     public void createNeo4jUserAllergyRelationship(String userName, String allergen) {
         Transaction transaction = neo4jSession.beginTransaction();

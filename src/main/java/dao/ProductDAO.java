@@ -28,7 +28,7 @@ public class ProductDAO {
     private Map<String, Product> deletedProducts = new HashMap<>();
 
     public ProductDAO() {
-        mongoClient = MongoClients.create("mongodb://localhost:27017");
+        mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
         database = mongoClient.getDatabase("SafeBite");
         productsCollection = database.getCollection("Products");
         neo4jManager = new Neo4jManager();

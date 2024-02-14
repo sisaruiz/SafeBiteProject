@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.bson.Document;
+import dao.UserDAO;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.client.*;
@@ -32,16 +33,10 @@ public class LoginServlet extends HttpServlet {
 		response.setContentType("text/html");
 		
 		//Create connection string
-		ConnectionString uri = new ConnectionString("mongodb://localhost:27017");
-		//Create a mongoDB client
-		MongoClient myClient = MongoClients.create(uri);
-		//Connect to SafeBite database
-		MongoDatabase database = myClient.getDatabase("SafeBite");
-		//Select the collection test
-		MongoCollection<Document> usersCollection = database.getCollection("Users");
+		UserDAO userDAO = new UserDAO();
 		
         // Perform authentication logic
-        Document user = usersCollection.find(new Document("user_name", n).append("password", pwd)).first();
+        Document user = userDAO.find(n, pwd);
 
         if (user != null) {
             // Authentication successful
@@ -65,7 +60,7 @@ public class LoginServlet extends HttpServlet {
 			rd.include(request, response);
         }
         
-        myClient.close();
+        userDAO.closeConnections();
 	}
 
 }

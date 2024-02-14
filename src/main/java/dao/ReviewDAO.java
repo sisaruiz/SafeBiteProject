@@ -27,7 +27,7 @@ public class ReviewDAO {
 
     public ReviewDAO() {
         // Set up MongoDB connection and get the review collection
-        this.mongoClient = MongoClients.create("mongodb://localhost:27017");
+        this.mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
         this.reviewCollection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
     }
     

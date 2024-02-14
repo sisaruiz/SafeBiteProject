@@ -32,7 +32,7 @@ public class UserDAO {
 
 
     public UserDAO() {
-        mongoClient = MongoClients.create("mongodb://localhost:27017");
+        mongoClient = MongoClients.create("mongodb://localhost:27017/" + "?w=1&readPreferences=nearest&timeout=5000");
         database = mongoClient.getDatabase("SafeBite");
         usersCollection = database.getCollection("Users");       
         neo4jManager = new Neo4jManager();
@@ -41,6 +41,10 @@ public class UserDAO {
     
     public Boolean verifyDummyUser(String user) {
     	return neo4jManager.verifyDummyUser(user);
+    }
+    
+    public Document find(String un, String psw) {
+    	return usersCollection.find(new Document("user_name", un).append("password", psw)).first();
     }
 
     public User getUserByUsername(String username) {
