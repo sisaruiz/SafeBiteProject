@@ -37,7 +37,6 @@ public class UserDAO {
         database = mongoClient.getDatabase("SafeBite");
         usersCollection = database.getCollection("Users");       
         neo4jManager = new Neo4jManager();
-        
     }
     
     public Boolean verifyDummyUser(String user) {

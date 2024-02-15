@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Product" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,6 +33,11 @@
         String searchTerm = (String) request.getAttribute("searchTerm");
         // Retrieve the search results from the request attribute
         List<Product> allProducts = (List<Product>) request.getAttribute("allProducts");
+
+        // Retrieve the sessio
+        HttpSession hs = request.getSession();
+        // Check if the admin attribute is true in the session
+        boolean isAdmin = (hs.getAttribute("admin") != null) && (Boolean) hs.getAttribute("admin");
     %>
 
     <p>Number of results: <%= allProducts.size() %></p>
@@ -44,7 +50,7 @@
             <div class="product-container">
                 <img class="product-image" src="<%= product.getImgURL() %>">
                 <p>
-                    <a href="productDetails.jsp?productId=<%= product.getId() %>"><%= product.getName() %></a>
+                    <a href="<%= isAdmin ? "productEdit.jsp" : "productDetails.jsp" %>?productId=<%= product.getId()%>"><%= product.getName() %></a>
                 </p>
             </div>
             <%
