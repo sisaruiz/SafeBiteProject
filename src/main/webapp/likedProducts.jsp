@@ -6,18 +6,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Liked Products</title>
+    <meta charset="UTF-8">
+    <title>Liked Products</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        a {
+            text-decoration: none;
+            color: #28a745;
+            margin-right: 10px;
+        }
+
+        p {
+            color: #888;
+        }
+    </style>
 </head>
 <body>
 <%
-    // Assuming 'userName' is the current user's name, replace it with the actual attribute or session value
     String userName = (String) session.getAttribute("uname");
-
-    // Create an instance of Neo4jManager
     Neo4jManager neo4jManager = new Neo4jManager();
-
-    // Retrieve liked products for the user
     List<Product> likedProducts = neo4jManager.getLikedProductsForUser(userName);
 %>
 
@@ -38,7 +55,6 @@
 %>
 
 <%
-    // Close the Neo4j connection
     neo4jManager.closeNeo4jConnection();
 %>
 </body>

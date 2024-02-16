@@ -14,6 +14,47 @@
 <head>
 <meta charset="UTF-8">
 <title>User profile</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .user-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        p {
+            margin-bottom: 5px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input[type="submit"], input[type="button"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        input[type="submit"]:disabled, input[type="button"]:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .review {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+</style>
 </head>
 <body>
 	<%

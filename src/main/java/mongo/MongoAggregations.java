@@ -10,7 +10,6 @@ import org.bson.Document;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Projections;
@@ -36,6 +35,9 @@ public class MongoAggregations {
 	private UserDAO userDAO;
 	
 
+	/**
+     * Constructor initializes ProductDAO, ReviewDAO, and UserDAO.
+     */
     public MongoAggregations() {
     	
     	productDAO = new ProductDAO();
@@ -43,24 +45,28 @@ public class MongoAggregations {
     	userDAO = new UserDAO();
     }
 
-    //Retrieves the aggregate result for the count of products in each category.
+    
+    /**
+     * Retrieves the count of products in each category.
+     *
+     * @return Aggregate result for the count of products in each category.
+     */
     public AggregateIterable<Document> getProductCategoryCounts() {
-        // Perform aggregation using the MongoDB Java driver
+        
         return productDAO.productsCollection.aggregate(Arrays.asList(
-                // Group products by the 'main_category' field and calculate the count of each group
                 group("$main_category", sum("count", 1)),
-
                 sort(descending("count")),
                 limit(10),
-                
-                // Group the limited results by the '_id' (main_category) field and recalculate the count
                 group("$_id", sum("count", "$count")),
-
-                // Sort the final results in descending order based on the count
                 sort(descending("count"))
         ));
     }
     
+    /**
+     * Retrieves product count by brand and country, limiting to the top 20 results.
+     *
+     * @return List of documents containing product count by brand and country.
+     */
     public List<Document> getProductCountByBrandAndCountry() {
         Bson matchStage = match(and(exists("brands"), exists("countries_en")));
         
@@ -81,16 +87,19 @@ public class MongoAggregations {
         
         List<Document> results = productDAO.productsCollection.aggregate(pipeline).into(new ArrayList<>());
         
-        // Print the results for debugging
         System.out.println("Aggregation Results: " + results);
         
         return results;
     }
 
-    // STATIC IN RETURN
-    
+    /**
+     * Retrieves the most reviewed products based on the provided limit.
+     *
+     * @param limit Number of products to retrieve.
+     * @return List of documents containing the most reviewed products.
+     */
     public List<Document> getMostReviewedProducts(int limit) {
-        // Aggregation pipeline
+        
         List<Document> pipeline = Arrays.asList(
             new Document("$group", new Document("_id",
                 new Document("ProductID", "$Product ID").append("ProductName", "$Product Name"))
@@ -103,10 +112,8 @@ public class MongoAggregations {
                 .append("reviewCount", 1))
         );
 
-        // Execute the aggregation pipeline
         AggregateIterable<Document> aggregationResult = reviewDAO.reviewCollection.aggregate(pipeline);
 
-        // Convert the result to a list of documents
         List<Document> mostReviewedProducts = new ArrayList<>();
         for (Document document : aggregationResult) {
             mostReviewedProducts.add(document);
@@ -115,9 +122,14 @@ public class MongoAggregations {
         return mostReviewedProducts;
     }
     
-
+    /**
+     * Retrieves top reviewers and their average ratings based on the provided limit.
+     *
+     * @param limit Number of top reviewers to retrieve.
+     * @return List of documents containing top reviewers and their average ratings.
+     */
     public List<Document> getTopReviewersAndAverageRating(int limit) {
-        // Aggregation pipeline
+        
         List<Document> pipeline = Arrays.asList(
                 new Document("$group", new Document("_id", "$User")
                         .append("totalProductsReviewed", new Document("$sum", 1))
@@ -130,10 +142,8 @@ public class MongoAggregations {
                         .append("averageRating", 1))
         );
 
-        // Execute the aggregation pipeline
         AggregateIterable<Document> aggregationResult = reviewDAO.reviewCollection.aggregate(pipeline);
 
-        // Convert the result to a list of documents
         List<Document> topReviewersAndAverageRating = new ArrayList<>();
         for (Document document : aggregationResult) {
             topReviewersAndAverageRating.add(document);
@@ -142,7 +152,11 @@ public class MongoAggregations {
         return topReviewersAndAverageRating;
 }
    
-
+    /**
+     * Calculates gender percentage by diet type using aggregation.
+     *
+     * @return Aggregate result for gender percentage by diet type.
+     */
     public AggregateIterable<Document> calculateGenderPercentageByDietType() {
         Document groupByGenderAndDietType = new Document("$group", new Document("_id",
                 new Document("diet_type", "$diet_type")
@@ -174,28 +188,27 @@ public class MongoAggregations {
     }
     
 
-    
+    /**
+     * Retrieves user rating distribution over time for the provided username.
+     *
+     * @param username Username for which to retrieve the rating distribution.
+     * @return List of documents containing user rating distribution over time.
+     */
     public List<Document> getUserRatingDistributionOverTime(String username) {
         List<Document> userRatingDistribution = new ArrayList<>();
 
         List<Bson> pipeline = Arrays.asList(
-                // Stage 1: Match documents where the "User" field matches the provided username
                 match(eq("User", username)),
-
-                // Stage 2: Group documents by the "Review Date" field
                 group("$Review Date",
-                        Accumulators.push("ratings", "$Review Rating"), // Collect "Review Rating" values in an array
-                        sum("count", 1) // Count the number of documents in each group
+                        Accumulators.push("ratings", "$Review Rating"), 
+                        sum("count", 1)
                 ),
-
-                // Stage 3: Project the result to shape the output
                 project(Projections.fields(
-                        Projections.excludeId(), // Exclude the default "_id" field
-                        Projections.computed("Review Date", new Document("$toDate", "$_id")), // Convert "_id" to date
-                        Projections.include("ratings", "count") // Include the "ratings" and "count" fields
+                        Projections.excludeId(), 
+                        Projections.computed("Review Date", new Document("$toDate", "$_id")), 
+                        Projections.include("ratings", "count")
                 )),
 
-                // Stage 4: Add an additional field "averageRating" using $cond and $arrayElemAt
                 addFields(new Field<>("averageRating", new Document("$cond",
                         Arrays.asList(
                                 new Document("$eq", Arrays.asList("$ratings", Arrays.asList((Object) null))),
@@ -204,18 +217,15 @@ public class MongoAggregations {
                         )
                 ))),
 
-                // Stage 5: Sort the result by "Review Date" in descending order
                 sort(ascending("Review Date"))
         );
         
-        // Print the intermediate results after each stage
         for (Bson stage : pipeline) {
             System.out.println("Stage: " + stage.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()));
         }
 
         reviewDAO.reviewCollection.aggregate(pipeline).into(userRatingDistribution);
         
-        // Print the components of the returned list
         for (Document document : userRatingDistribution) {
         	List<?> ratings = document.get("ratings", List.class);
         	System.out.println("Ratings: " + ratings);
@@ -228,7 +238,9 @@ public class MongoAggregations {
         return userRatingDistribution;
     }    
 
-
+    /**
+     * Closes connections to MongoDB.
+     */
     public void closeConnection() {
         userDAO.closeConnections();
         productDAO.closeConnections();

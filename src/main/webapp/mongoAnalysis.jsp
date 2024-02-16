@@ -7,12 +7,11 @@
 
 <html>
 
-<%!  // Declaration of the method outside the scriptlet block
+<%!  
     String formatCategory(Object category) {
         if (category == null) {
             return "unspecified";
         } else if (category instanceof String) {
-            // Remove the "en:" prefix
             return ((String) category).replace("en:", "");
         } else {
             return category.toString();
@@ -37,6 +36,32 @@ String formatPercentage(double percentage) {
 
 <head>
     <title>MongoDB Aggregation Results</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+</style>
 </head>
 <body>
 
@@ -158,9 +183,7 @@ String formatPercentage(double percentage) {
 
 
 <%
-    // Close the MongoDB connections after using the results
-    mongo.closeConnection();
-    
+    mongo.closeConnection();  
 %>
 </body>
 </html>

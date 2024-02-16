@@ -47,7 +47,6 @@ public class UpdateProfileServlet extends HttpServlet {
             	response.sendRedirect("yourProfile.jsp");
             }
         } else {
-            // Handle the case where the user is not found
             response.getWriter().println("User not found");
         }
         

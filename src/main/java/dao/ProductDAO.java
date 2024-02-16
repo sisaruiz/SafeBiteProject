@@ -7,14 +7,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.neo4j.driver.exceptions.Neo4jException;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -28,7 +26,10 @@ public class ProductDAO {
     public MongoCollection<Document> productsCollection;
     private Neo4jManager neo4jManager;
     private Map<String, Product> deletedProducts = new HashMap<>();
-
+    
+    /**
+     * Constructor to initialize MongoDB and Neo4j connections.
+     */
     public ProductDAO() {
         mongoClient = MongoClients.create("mongodb://10.1.1.20:27017,10.1.1.21:27017,10.1.1.22:27017/" + 
         								"?w=1&readPreferences=nearest&timeout=5000");
@@ -37,44 +38,41 @@ public class ProductDAO {
         neo4jManager = new Neo4jManager();
     }
     
+    /**
+     * Searches for products based on the given search term.
+     *
+     * @param searchTerm The term to search for in product names.
+     * @return List of products matching the search term.
+     */
     public List<Product> searchProducts(String searchTerm) {
         List<Product> products = new ArrayList<>();
 
-        // Ensure productsCollection is not null
         if (productsCollection != null) {
             try {
-                // Capture the start time
                 long startTime = System.currentTimeMillis();
 
-                // Check if searchTerm is not null and has a reasonable length
                 if (searchTerm != null && searchTerm.length() >= MINIMUM_SEARCH_TERM_LENGTH) {
-                    // Construct the MongoDB Text Search Query
+                    
                     Document textSearchQuery = new Document("$text", new Document("$search", searchTerm));
 
-                    // Use explain to analyze the query execution plan
                     Document queryExplain = productsCollection.find(textSearchQuery).explain();
                     System.out.println("Query Execution Plan: " + queryExplain.toJson());
 
-                    // Define the fields to include in the projection
                     Document projection = new Document("product_name", 1)
                                            .append("image_url", 1);
 
-                    // Iterate through the results
                     for (Document productDoc : productsCollection.find(textSearchQuery).projection(projection)) {
-                        // Extract fields from the Document
+                        
                         String productId = productDoc.getObjectId("_id").toString();
                         String productName = productDoc.getString("product_name");
                         String imageUrl = productDoc.getString("image_url");
 
-                        // Create a Product instance
                         Product product = new Product(productId, productName, imageUrl);
                         products.add(product);
                     }
 
-                    // Capture the end time
                     long endTime = System.currentTimeMillis();
 
-                    // Calculate and print the time taken
                     long totalTime = endTime - startTime;
                     System.out.println("MongoDB query took " + totalTime + " milliseconds.");
                 } else {
@@ -92,30 +90,27 @@ public class ProductDAO {
         return products;
     }
 
-
-    
-    // Add a method to retrieve a product by its ID
+    /**
+     * Retrieves product details by the given product ID.
+     *
+     * @param productId The unique identifier for the product.
+     * @return Product object with details or null if not found.
+     */
     public Product getProductById(String productId) {
 
-    	// Convert the string representation of ObjectId to ObjectId
         ObjectId objectId;
         try {
             objectId = new ObjectId(productId);
         } catch (IllegalArgumentException e) {
-            // Handle invalid ObjectId format
             System.out.println("Invalid ObjectId format for product ID: " + productId);
             return null;
         }
 
-        // Construct the query to find the product by ObjectId
         Document query = new Document("_id", objectId);
 
-        // Execute the query and retrieve the product document
         Document productDoc = productsCollection.find(query).first();
 
-        // Check if the product document is found
         if (productDoc != null) {
-            // Extract fields from the document
             String productName = productDoc.getString("product_name");
             String imageUrl = productDoc.getString("image_url");
             String allergens = productDoc.getString("allergens");
@@ -131,20 +126,21 @@ public class ProductDAO {
             String quantity = productDoc.getString("quantity");
             String traces = productDoc.getString("traces_tags");
             
-            // Create and return a Product instance
             return new Product(productId, productName, imageUrl, quantity, categories, ingredients,
             		allergens, traces, labels, brandOwner, brands, countries, entryTS, lastUpdator,
             		updateTS);
         } else {
-            // Product not found
             System.out.println("Product not found for ID: " + productId);
             return null;
         }
     }
-    
-    
-    // ADD PRODUCT
-    
+
+    /**
+     * Adds a new product to MongoDB and creates corresponding nodes and relationships in Neo4j.
+     *
+     * @param product The product to be added.
+     * @return True if the product is added successfully, false otherwise.
+     */
     public Boolean addProduct(Product product) {
     	try {
     		addProductMongoDB(product);
@@ -177,6 +173,11 @@ public class ProductDAO {
     	
     }
 
+    /**
+     * Adds a new product to MongoDB.
+     *
+     * @param product The product to be added to the database.
+     */
 	private void addProductMongoDB(Product product) {
 		// TODO Auto-generated method stub
     	Document productDoc = new Document("product_name", product.getName())
@@ -194,24 +195,24 @@ public class ProductDAO {
                 .append("last_modified_datetime", product.getLastUpdateTS())
                 .append("last_modified_by", product.getLastUpdateBy());
 
-        // Insert the document into the 'Products' collection
         productsCollection.insertOne(productDoc);
 
         System.out.println("Product successfully added to MongoDB.");
         
-        // Retrieve the generated MongoDB ID and set it in the Product object
         ObjectId insertedId = productDoc.getObjectId("_id");
         product.setId(insertedId.toString());
 	}
     
-	
-	// UPDATE PRODUCT
-	
+	/**
+     * Updates an existing product in MongoDB and updates corresponding nodes in Neo4j.
+     *
+     * @param product The product with updated information.
+     * @return True if the update is successful, false otherwise.
+     */
     public Boolean updateProduct(Product product) {
     	
     	try {
     		updateProductMongoDB(product);
-    		// Update the product in Neo4j
             neo4jManager.updateNeo4jProductNode(product);
     	}
     	catch(MongoException e) {
@@ -233,22 +234,30 @@ public class ProductDAO {
     	return true;
     }
     
+    /**
+     * Updates an existing product in MongoDB.
+     *
+     * @param product The product with updated information.
+     */
     public void updateProductMongoDB(Product product) {
-        // Convert Product object to Document
         Document toUpdate = createProductDocument(product);
 
-        // Construct the query to find the product by ObjectId
         Document query = new Document("_id", new ObjectId(product.getId()));
         
         Document updateDoc = new Document("$set", toUpdate);
 
-        // Update the document in the 'Products' collection
         productsCollection.updateOne(query, updateDoc);
     }
     
+    /**
+     * Reverts the update operation in MongoDB by restoring the original product data.
+     *
+     * @param productId The ID of the product to be reverted.
+     * @param existingProductData The original data of the product before the update.
+     */
     public void revertMongoDBProductUpdate(String productId, Product existingProductData) {
         if (existingProductData != null) {
-            // Create an update document with the existing user information
+
             Document update = new Document("$set", new Document()
             		.append("product_name", existingProductData.getName())
                     .append("image_url", existingProductData.getImgURL())
@@ -262,17 +271,18 @@ public class ProductDAO {
                     .append("quantity", existingProductData.getQuantity())
                     .append("traces_tags", existingProductData.getTraces()));
 
-            // Update the document in the MongoDB collection with the existing data
             productsCollection.updateOne(new Document("_id", new ObjectId(productId)), update);
         }
     }
 
-    
-    // DELETE PRODUCT
-    
+    /**
+     * Deletes a product from MongoDB and its corresponding nodes in Neo4j.
+     *
+     * @param product The product to be deleted.
+     * @return True if the deletion is successful, false otherwise.
+     */
     public Boolean deleteProduct(Product product) {
     	try {
-    		// Store the user information before deleting
             Product deletedProductData = getExistingProductData(product.getId());
             deletedProducts.put(product.getId(), deletedProductData);
     		deleteProductMongoDB(product.getId());
@@ -297,6 +307,13 @@ public class ProductDAO {
     	return true;
     }
     
+    
+    /**
+     * Retrieves existing product data from MongoDB based on the product ID.
+     *
+     * @param id The ID of the product to retrieve data for.
+     * @return Product object with existing data or null if not found.
+     */
 	private Product getExistingProductData(String id) {
 		Document productDocument = productsCollection.find(new Document("_id", new ObjectId(id))).first();
         if (productDocument != null) {
@@ -312,18 +329,26 @@ public class ProductDAO {
         return null;
 	}
 
+	/**
+     * Reverts the deletion operation in MongoDB by restoring the deleted product.
+     *
+     * @param productId The ID of the product to be reverted.
+     */
 	private void revertMongoDBProductDelete(String productId) {
 		// TODO Auto-generated method stub
 		if (deletedProducts.containsKey(productId)) {
             Product deletedProductData = deletedProducts.get(productId);
-            // Insert the deleted user data back into the MongoDB collection
             productsCollection.insertOne(createProductDocument(deletedProductData));
-            // Remove the user from the temporary storage
             deletedProducts.remove(productId);
         }	
 	}
 	
-	// Helper method to convert User object to MongoDB Document
+	/**
+     * Creates a MongoDB document from a Product object.
+     *
+     * @param product The Product object to create a MongoDB document for.
+     * @return MongoDB Document representing the product.
+     */
     private Document createProductDocument(Product product) {
         return new Document("product_name", product.getName())
                 .append("image_url", product.getImgURL())
@@ -341,15 +366,22 @@ public class ProductDAO {
                 .append("last_modified_by", product.getLastUpdateBy());
     }
 
+    /**
+     * Deletes a product from MongoDB based on the product ID.
+     *
+     * @param productId The ID of the product to be deleted.
+     */
 	public void deleteProductMongoDB(String productId) {
 		// TODO Auto-generated method stub
         ObjectId objectId = new ObjectId(productId);
         Document query = new Document("_id", objectId);
 
-        // Delete the document from the 'Products' collection
         productsCollection.deleteOne(query);
 	}
 	
+	/**
+     * Closes MongoDB and Neo4j connections.
+     */
 	public void closeConnections() {
         if (mongoClient != null) {
             mongoClient.close();

@@ -13,9 +13,6 @@ import java.io.PrintWriter;
 import org.bson.Document;
 import dao.UserDAO;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.client.*;
-
 /**
  * Servlet implementation class LoginServlet
  */

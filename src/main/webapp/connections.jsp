@@ -14,6 +14,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Your Connections</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 10px;
+        }
+
+        p {
+            color: #888;
+        }
+    </style>
 </head>
 <body>
     <h1>Your Connections</h1>
@@ -54,7 +75,6 @@
     %>
 
     <%
-      // Don't forget to close the Neo4j connection when done
       neo4jManager.closeNeo4jConnection();
     %>
 </body>

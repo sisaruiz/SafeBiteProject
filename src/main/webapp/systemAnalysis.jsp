@@ -25,11 +25,11 @@
         }
 
         .histogram-bar2 {
-            background-color: green; /* Change the color as needed */
+            background-color: green; 
             color: white;
         }
         .histogram-bar3 {
-            background-color: orange; /* Change the color as needed */
+            background-color: orange; 
             color: white;
         }
 
@@ -65,25 +65,21 @@
 </head>
 <body>
 
-<%! // Declaration tag for method
+<%! 
     // Function to calculate the width of the histogram bar based on followers count
     private int calculateHistogramWidth(long followersCount) {
-        // Adjust the multiplier or any other logic based on your requirements
-        return (int) (followersCount * 50); // Adjust the multiplier as needed
+        return (int) (followersCount * 50); 
     }
 
 //Function to calculate the width for the second section
 private int calculateHistogramWidthForDiets(long userCount) {
-    // Adjust the multiplier or any other logic based on your requirements
-    return (int) (userCount * 7); // Adjust the multiplier as needed
+    return (int) (userCount * 7); 
 }
 
 //Function to calculate the width for the third section
 private int calculateHistogramWidthForAllergens(long userCount) {
-    // Adjust the multiplier or any other logic based on your requirements
-    return (int) (userCount * 3); // Adjust the multiplier as needed
+    return (int) (userCount * 3); 
 }
-
 
 %>
 
@@ -92,15 +88,11 @@ private int calculateHistogramWidthForAllergens(long userCount) {
 <section>
     <h3>Most Popular Users</h3>
     <div class="histogram-container">
-        <!-- Add your histogram display logic here -->
         <%
-            // Initialize Neo4j Driver
             Neo4jManager neo4jManager = new Neo4jManager();
 
-            // Get the most popular users with followers count
             List<String[]> popularUsersWithFollowers = neo4jManager.getMostPopularUsersWithFollowersCount();
 
-            // Display the most popular users as a histogram in descending order
             for (String[] userWithFollowers : popularUsersWithFollowers) {
                 String username = userWithFollowers[0];
                 long followersCount = Long.parseLong(userWithFollowers[1]);
@@ -128,7 +120,6 @@ private int calculateHistogramWidthForAllergens(long userCount) {
 <%
     List<String[]> mostFollowedDietsWithUserCount = neo4jManager.getMostFollowedDietsWithUserCount();
 
-    // Prepare data for pie chart
     String[] dietTypes = new String[mostFollowedDietsWithUserCount.size()];
     int[] userCounts = new int[mostFollowedDietsWithUserCount.size()];
     int i = 0;
@@ -197,9 +188,7 @@ private int calculateHistogramWidthForAllergens(long userCount) {
 <section>
     <h3>Most Popular Allergens</h3>
     <div class="histogram-container">
-        <!-- Add your histogram display logic here -->
         <%
-            // Get allergens with the number of users allergic to each allergen
             List<String[]> allergensWithUserCount = neo4jManager.getAllergensWithUserCount();
 
             // Display allergens and users count as a histogram
@@ -221,7 +210,6 @@ private int calculateHistogramWidthForAllergens(long userCount) {
 
 
 <br>
-<!-- Add a button to navigate to systemAnalysis.jsp -->
 <form action="adminHome.jsp">
     <input type="submit" value="Return Home">
 </form>

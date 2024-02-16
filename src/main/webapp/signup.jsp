@@ -5,6 +5,54 @@
 <head>
 <meta charset="UTF-8">
 <title>Register</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+    }
+
+    h1 {
+        color: #007bff;
+    }
+
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    input[type="radio"] {
+        margin-right: 5px;
+    }
+
+    input[type="submit"], input[type="reset"] {
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover, input[type="reset"]:hover {
+        background-color: #218838;
+    }
+
+    p {
+        color: #888;
+    }
+</style>
 </head>
 <body>
 <h1>Sign up</h1>

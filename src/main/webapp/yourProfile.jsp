@@ -17,6 +17,39 @@
 <head>
 <meta charset="UTF-8">
 <title>Your Profile</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .user-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        p {
+            margin-bottom: 5px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .review {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+</style>
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -76,8 +109,8 @@
             }]
         },
         options: {
-        	responsive: false, // Ensure the chart doesn't resize to fit the container
-            maintainAspectRatio: false, // Maintain the aspect ratio
+        	responsive: false, 
+            maintainAspectRatio: false, 
             scales: {
                 x: {
                     type: 'category',
@@ -86,13 +119,12 @@
                 y: {
                     beginAtZero: false,
                     min: 1,
-                    max: 5 // Assuming the rating scale is from 0 to 5
+                    max: 5 
                 }
             }
         }
     };
 
-    // Create and render the chart
     var ctx = document.getElementById('lineChart').getContext('2d');
     var myChart = new Chart(ctx, config);
 </script>

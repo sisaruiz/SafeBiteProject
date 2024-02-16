@@ -10,6 +10,56 @@
 <head>
 <meta charset="UTF-8">
 <title>Administrator home</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    h1, h2, h3 {
+        text-align: center;
+        margin-top: 30px;
+    }
+    form {
+        text-align: center;
+        margin: 20px auto;
+    }
+    input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+    input[type="submit"],
+    input[type="reset"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin: 10px 0;
+    }
+    input[type="submit"]:hover,
+    input[type="reset"]:hover {
+        background-color: #45a049;
+    }
+    section {
+        background-color: #fff;
+        padding: 20px;
+        margin: 20px auto;
+        width: 80%;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    p {
+        text-align: center;
+        margin-top: 10px;
+    }
+</style>
 </head>
 <body>
 <%
@@ -66,13 +116,11 @@ Welcome, <%=session.getAttribute("uname")%>
 
 
 <br>
-<!-- Add a button to navigate to systemAnalysis.jsp -->
 <form action="systemAnalysis.jsp">
     <input type="submit" value="System Analysis">
 </form>
 
 <br>
-<!-- Add a button to navigate to mongoAnalysis.jsp -->
 <form action="mongoAnalysis.jsp">
     <input type="submit" value="Mongo Analysis">
 </form>

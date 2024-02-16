@@ -7,6 +7,37 @@
 <html>
 <head>
     <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        .user-container {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .user-link {
+            text-decoration: none;
+            color: #0066cc;
+        }
+        .delete-form {
+            display: inline;
+        }
+        .delete-button {
+            background-color: #cc0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #ff3333;
+        }
+    </style>
 </head>
 <body>
     <h1>Search Results</h1>

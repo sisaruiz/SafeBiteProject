@@ -43,7 +43,7 @@ public class SignupServlet extends HttpServlet {
             RequestDispatcher rd = request.getRequestDispatcher("signup.jsp");
             rd.include(request, response);
             userdao.closeConnections();
-            return; // Exit the method if username exists
+            return; 
         }
         
         if (userdao.verifyDummyUser(username)) {

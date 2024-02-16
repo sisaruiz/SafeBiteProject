@@ -7,23 +7,45 @@
 <head>
     <title>Search Results</title>
     <style>
-        /* Set a fixed width and height for the product images */
         img.product-image {
-            width: 80px; /* Set your preferred width */
-            height: 80px; /* Set your preferred height */
-            object-fit: cover; /* Optional: Maintain aspect ratio and cover entire container */
+            width: 80px; 
+            height: 80px; 
+            object-fit: cover; 
         }
 
-        /* Create a grid layout with 5 columns */
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); /* Adjust the number of columns as needed */
-            gap: 10px; /* Adjust the gap between products */
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 10px; 
+            margin-top: 20px;
         }
 
-        /* Style for individual product container */
         .product-container {
             text-align: center;
+        }
+
+        .active-page {
+            font-weight: bold;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #f5f5f5;
         }
     </style>
 </head>

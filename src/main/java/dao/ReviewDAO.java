@@ -25,13 +25,21 @@ public class ReviewDAO {
     private final MongoClient mongoClient;
     public final MongoCollection<Document> reviewCollection;
 
+    /**
+     * Constructor to initialize MongoDB connection and review collection.
+     */
     public ReviewDAO() {
-        // Set up MongoDB connection and get the review collection
         this.mongoClient = MongoClients.create("mongodb://10.1.1.20:27017,10.1.1.21:27017,10.1.1.22:27017/" +
         										"?w=1&readPreferences=nearest&timeout=5000");
         this.reviewCollection = mongoClient.getDatabase("SafeBite").getCollection("Reviews");
     }
     
+    /**
+     * Retrieve reviews for a given product ID from MongoDB.
+     *
+     * @param productId Product ID to filter reviews.
+     * @return List of Review objects for the specified product ID.
+     */
     public List<Review> getReviewsByProductId(String productId) {
         List<Review> reviews = new ArrayList<>();
 
@@ -42,18 +50,22 @@ public class ReviewDAO {
                 reviews.add(review);
             }
         } catch (Exception e) {
-            // Handle exceptions appropriately (e.g., log the error, throw an exception)
             e.printStackTrace();
-            // You might want to throw an exception here or return an empty list
         }
 
         return reviews;
     }
 
+    /**
+     * Retrieve the last three reviews along with their dates for a given username.
+     *
+     * @param username User for whom reviews are retrieved.
+     * @return Map containing reviews and their corresponding dates.
+     */
     public Object getLastThreeReviewsWithDates(String username) {
         List<Document> userReviews = new ArrayList<>();
         List<Review> reviews = new ArrayList<>();
-        List<Date> reviewDates = new ArrayList<>();  // List to store review dates
+        List<Date> reviewDates = new ArrayList<>(); 
 
         try (MongoCursor<Document> cursor = reviewCollection.find(Filters.eq("User", username)).iterator()) {
             while (cursor.hasNext()) {
@@ -61,12 +73,10 @@ public class ReviewDAO {
             }
         }
 
-        // Check if there are no reviews
         if (userReviews.isEmpty()) {
             return Collections.emptyMap(); 
         }
 
-        // Sort the reviews by date in descending order
         userReviews.sort(Comparator.comparing(document -> {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
@@ -74,28 +84,24 @@ public class ReviewDAO {
                 return date;
             } catch (ParseException e) {
                 e.printStackTrace();
-                return new Date(0); // Use a default date if parsing fails
+                return new Date(0); 
             }
         }).reversed());
 
-        // Retrieve the last 3 reviews and their dates
         for (int i = 0; i < Math.min(userReviews.size(), 3); i++) {
             Document reviewDoc = userReviews.get(i);
             Review review = documentToReview(reviewDoc);
             reviews.add(review);
 
-            // Get and add the date to the list
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
                 Date date = dateFormat.parse((String) reviewDoc.get("Review Date"));
                 reviewDates.add(date);
             } catch (ParseException e) {
                 e.printStackTrace();
-                // Handle the exception if needed
             }
         }
 
-        // Create a Map to store both reviews and dates
         Map<String, Object> result = new HashMap<>();
         result.put("reviews", reviews);
         result.put("reviewDates", reviewDates);
@@ -103,6 +109,12 @@ public class ReviewDAO {
         return result;
     }        
 
+    /**
+     * Convert MongoDB document to a Review object.
+     *
+     * @param document MongoDB document representing a review.
+     * @return Review object created from the document.
+     */
     private Review documentToReview(Document document) {
     	ObjectId revID = document.getObjectId("_id");
         String username = document.getString("User");
@@ -117,22 +129,28 @@ public class ReviewDAO {
         		reviewHeading, reviewRating);
     }
     
+    /**
+     * Delete a review from MongoDB using its ID.
+     *
+     * @param reviewId ID of the review to be deleted.
+     */
     public void deleteReviewById(String reviewId) {
         try {
-            // Convert reviewId to ObjectId
             ObjectId objectId = new ObjectId(reviewId);
 
-            // Delete the review by its ID
             reviewCollection.deleteOne(Filters.eq("_id", objectId));
         } catch (Exception e) {
-            // Handle exceptions appropriately (e.g., log the error, throw an exception)
             e.printStackTrace();
         }
     }
     
+    /**
+     * Save a new review to MongoDB.
+     *
+     * @param review Review object to be saved.
+     */
     public void saveReviewToMongoDB(Review review) {
-		
-            // Create a document from the Review object
+
             Document reviewDocument = new Document("Review Rating", review.getReviewRating())
                     .append("Review Heading", review.getReviewHeading())
                     .append("Review Text", review.getReviewText())
@@ -141,10 +159,12 @@ public class ReviewDAO {
                     .append("User", review.getUsername())
                     .append("Product ID", review.getProductID());                    ;
 
-            // Insert the document into the MongoDB collection
             reviewCollection.insertOne(reviewDocument);
     }
     
+    /**
+     * Close the MongoDB connection.
+     */
     public void closeConnection() {
         if (mongoClient != null) {
             mongoClient.close();

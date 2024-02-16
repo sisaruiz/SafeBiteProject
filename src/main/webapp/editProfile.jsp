@@ -7,13 +7,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Profile</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
 
 <h1>Edit Your Profile</h1>
 
 <%
-    // Retrieve user details from the session or database
     String username = (String) session.getAttribute("uname");
     UserDAO userDAO = new UserDAO();
     User user = userDAO.getUserByUsername(username);
@@ -59,7 +102,6 @@
 	<input type="checkbox" id="tomato" name="allergens" value="tomato" <%=(user.getAllergens().contains("tomato")) ? "checked" : "" %>/><label for="tomato">Tomato</label>
 	<input type="checkbox" id="peaches" name="allergens" value="peaches" <%=(user.getAllergens().contains("peaches")) ? "checked" : "" %>/><label for="peaches">Peaches</label>
 	<br>
-    <!-- Add a submit button -->
     <input type="submit" value="Save Changes">
 </form>
 

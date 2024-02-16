@@ -31,7 +31,6 @@ public class LikeServlet extends HttpServlet {
             neo4jManager.deleteNeo4jUserProductLikeRelationship(userName, productId);
         }
 
-        // Redirect back to the product page
         response.sendRedirect("productDetails.jsp?productId=" + productId);
     }
 }

@@ -47,7 +47,6 @@ public class UpdateProductServlet extends HttpServlet {
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(productId);
 
-        // Update the product attributes
         product.setName(productName);
         product.setQuantity(quantity);
         product.setIngredients(ingredients);
@@ -62,12 +61,9 @@ public class UpdateProductServlet extends HttpServlet {
         product.setLUB(admin);
         product.setLUTS(new Date());
 
-        // Save the updated product
         if (productDAO.updateProduct(product)) {
-            // Redirect to the product details page
             out.println("Product updated successfully.");
         } else {
-            // Handle the case where the product is not found
         	out.println("Product update failed.");
         }
         productDAO.closeConnections();

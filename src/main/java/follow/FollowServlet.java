@@ -32,7 +32,6 @@ public class FollowServlet extends HttpServlet {
         	neo4jManager.deleteNeo4jFollowRelationship(currentUser, userToFollow);
         }
         
-        // Redirect back to the user's profile page
         response.sendRedirect("userDetails.jsp?user=" + userToFollow);
 	}
 

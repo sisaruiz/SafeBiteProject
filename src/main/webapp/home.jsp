@@ -6,7 +6,60 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login success</title>
+<title>Homepage</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    h2 {
+        text-align: center;
+        margin-top: 50px;
+    }
+    p {
+        text-align: center;
+    }
+    form {
+        text-align: center;
+    }
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #007bff;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    section {
+        margin: 20px auto;
+        width: 80%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #fff;
+    }
+    h3 {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+</style>
 </head>
 <body>
 <%
@@ -20,7 +73,6 @@
     List<String> potentialFriends = neo4jManager.findPotentialFriends(userName);
     request.setAttribute("potentialFriends", potentialFriends);
     
- // Retrieve and set recommended products
     List<String> recommendedProducts = neo4jManager.findRecommendedProducts(userName);
     request.setAttribute("recommendedProducts", recommendedProducts);
 %>
@@ -37,7 +89,7 @@ Welcome, <%=session.getAttribute("uname")%>
 <section>
     <form action="SearchServlet" method="POST">
         <label for="searchTerm">Search Product:</label>
-        <input type="text" id="searchTerm" name="searchTerm" required>
+        <input placeholder="type at least 3 letters" type="text" id="searchTerm" name="searchTerm" required>
         <br>
         <input type="submit" value="Search">
     </form>
@@ -46,7 +98,7 @@ Welcome, <%=session.getAttribute("uname")%>
     <h3>Explore recommended products ...</h3>
     <% if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
            for (String recommendedProduct : recommendedProducts) {
-               String[] productInfo = recommendedProduct.split("-"); // Assuming the delimiter is "-"
+               String[] productInfo = recommendedProduct.split("-");
                String productId = productInfo[0];
                String productName = productInfo[1];
     %>

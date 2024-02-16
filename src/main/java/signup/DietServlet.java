@@ -36,7 +36,7 @@ public class DietServlet extends HttpServlet {
 	    if (session == null || session.getAttribute("uname") == null) {
 	        // Redirect to login page
 	        response.sendRedirect("login.jsp");
-	        return; // Stop further execution
+	        return;
 	    }
 	    String username = (String) session.getAttribute("uname");
 	    String diet = request.getParameter("diet");
